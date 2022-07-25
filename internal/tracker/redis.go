@@ -37,7 +37,7 @@ func RedisAdd(infohash string, left int64, ip net.IP, port uint16) {
 func RedisGet(infohash string) (result []metainfo.Address) {
 
 	// remove all peers which are 15 minutes old
-	max := strconv.Itoa(int(time.Now().Unix() - 900))
+	max := strconv.FormatInt(time.Now().Unix()-900, 10)
 	Rdb.ZRemRangeByScore(ctx, infohash+":complete", "0", max)
 	Rdb.ZRemRangeByScore(ctx, infohash+":incomplete", "0", max)
 
