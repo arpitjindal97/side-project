@@ -3,19 +3,22 @@ package main
 import (
 	"example.com/m/internal/apiserver"
 	"example.com/m/internal/pkg/cassandra"
+	"example.com/m/internal/watchman"
 	"github.com/go-redis/redis/v9"
-	"log"
+	"strconv"
+	"time"
 )
 
 func main() {
+	watchman.JobStartTime = strconv.FormatInt(time.Now().Unix(), 10)
 
 	apiserver.Rdb = redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
+
 	apiserver.RedisKey = "apiserver"
-	defer apiserver.Rdb.Close()
 
 	cassandra.Conn = cassandra.Cluster{
 		URL:      []string{"localhost"},
@@ -25,6 +28,5 @@ func main() {
 	cassandra.Init()
 	defer cassandra.Conn.Session.Close()
 
-	err := apiserver.StartHTTPServer("0.0.0.0:8081")
-	log.Printf("http server shutdown: %s", err)
+	watchman.StartJob()
 }

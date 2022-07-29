@@ -22,12 +22,21 @@ func getRouter() *router.Router {
 	routeManager := ruler.NewRouter()
 
 	routeManager.
-		Path("/infohash/{id}").Method("GET").
-		HandlerFunc(InfohashGet("infohash_get"))
+		Path("/torrents/{id}").Method("GET").
+		HandlerFunc(GetTorrentById("GetTorrentById"))
 
 	routeManager.
-		Path("/infohash/{id}").Method("PUT").
-		HandlerFunc(InfohashPut("infohash_put"))
+		Path("/torrents").Method("POST").
+		HandlerFunc(PostTorrentById("PostTorrentById"))
+	/*
+		routeManager.
+			Path("/torrents/{id}").Method("GET").
+			HandlerFunc(storegateway.TorrentFindById("torrent_findByIdTorrent"))
+
+		routeManager.
+			Path("/torrents/search/findByInfoHashEquals").Method("GET").
+			HandlerFunc(storegateway.TorrentFindByInfoHashEquals("torrent_findByInfoHashEquals"))
+	*/
 
 	routeManager.Path("/metrics").Method("GET").
 		Handler(promhttp.Handler())

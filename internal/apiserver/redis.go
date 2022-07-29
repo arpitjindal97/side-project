@@ -2,6 +2,7 @@ package apiserver
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-redis/redis/v9"
 	"time"
 )
@@ -16,6 +17,7 @@ func RedisCount(time string) (count int64) {
 }
 
 func RedisAdd(infohash string) int {
+	fmt.Println("writing to redis infohash: " + infohash)
 	value := redis.Z{
 		Score:  float64(time.Now().Unix()),
 		Member: infohash,

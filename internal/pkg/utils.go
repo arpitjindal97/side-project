@@ -26,3 +26,7 @@ func GetPeersFromTrackers(id, infohash metainfo.Hash, trackers []string, peers [
 	}
 	return peers
 }
+
+func JsonError(err error) string {
+	return "{\"error\":\"" + err.Error() + "\"}"
+}
