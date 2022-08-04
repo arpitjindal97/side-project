@@ -14,37 +14,24 @@ import (
 func PostTorrentById(route string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		c := reqresp.GetContext(w, r)
-		//_, _ = fmt.Fprintf(w, "%s: %s", route, c.Data["id"])
-		//infohash := fmt.Sprintf("%s", c.Data["infohash"])
-
 		body, err := ioutil.ReadAll(c.Body)
 		if err != nil {
+			w.WriteHeader(502)
 			_, _ = fmt.Fprintf(w, "%s", pkg.JsonError(err))
 			return
 		}
 
 		var queue cassandra.Queue
 		err = json.Unmarshal(body, &queue)
-		if err != nil {
-			_, _ = fmt.Fprintf(w, "%s", pkg.JsonError(err))
-			return
-		}
-		if queue.InfoHash == "" {
+		if err != nil || queue.InfoHash == "" {
 			w.WriteHeader(400)
 			_, _ = fmt.Fprintf(w, "%s", pkg.JsonError(errors.New("bad request json")))
 			return
 		}
 
-		_ = RedisAdd(queue.InfoHash)
+		w.WriteHeader(200)
+		go addTorrent(queue.InfoHash)
 		_, _ = fmt.Fprintf(w, "successfully processed request")
-	}
-}
-
-func InfohashPost(route string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		c := reqresp.GetContext(w, r)
-
-		_, _ = fmt.Fprintf(w, "%s: %s", route, c.Body)
 	}
 }
 
@@ -60,7 +47,7 @@ func GetTorrentById(route string) http.HandlerFunc {
 			return
 		}
 
-		str, err := json.Marshal(torrent)
+		str, err := json.MarshalIndent(torrent, "", "    ")
 		if err != nil {
 			w.WriteHeader(502)
 			_, _ = fmt.Fprintf(w, "%s", pkg.JsonError(err))
@@ -68,5 +55,29 @@ func GetTorrentById(route string) http.HandlerFunc {
 		}
 		_, _ = fmt.Fprintf(w, "%s", str)
 		//_, _ = fmt.Fprintf(w, "%s: %s", route, infohash
+	}
+}
+
+func addTorrent(infohash string) {
+	if RedisGet(infohash) == nil {
+		// already in cache
+		return
+	}
+	RedisSet(infohash)
+	_, err := cassandra.FindTorrentByInfohash(infohash)
+	if err == nil {
+		// already indexed
+		// send to refresher
+		fmt.Println("Sending to refresher")
+		go func() {
+			_, _ = http.Get("http://localhost:8081/torrent/" + infohash)
+		}()
+	} else {
+		// check if it's already in queue
+		_, err = cassandra.FindQueueByInfohash(infohash)
+		if err != nil {
+			// was not present in queue
+			_ = cassandra.InsertQueueByInfohash(infohash)
+		}
 	}
 }

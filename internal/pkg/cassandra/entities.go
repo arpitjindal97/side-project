@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gocql/gocql"
 	"log"
+	"time"
 )
 
 type Cluster struct {
@@ -15,17 +16,20 @@ type Cluster struct {
 var Conn Cluster
 
 type Torrent struct {
-	InfoHash    string `json:"infohash"`
-	Title       string `json:"title"`
-	Category    string `json:"category"`
-	SubCategory string `json:"subcategory"`
-	Date        string `json:"date"`
-	User        string `json:"userid"`
-	Magnet      string `json:"magnet"`
-	Size        string `json:"size"`
-	Peers       int    `json:"peers"`
-	Seeders     int    `json:"seeders"`
-	Leechers    int    `json:"leechers"`
+	InfoHash    string    `json:"infohash"`
+	Category    string    `json:"category"`
+	SubCategory string    `json:"subcategory"`
+	Comment     string    `json:"comment"`
+	Creator     string    `json:"creator"`
+	Date        time.Time `json:"date"`
+	Leechers    int       `json:"leechers"`
+	Magnet      string    `json:"magnet"`
+	Name        string    `json:"name"`
+	NumFiles    int       `json:"num_files"`
+	Peers       int       `json:"peers"`
+	Seeders     int       `json:"seeders"`
+	Size        string    `json:"size"`
+	User        string    `json:"userid"`
 }
 
 type User struct {
@@ -42,9 +46,9 @@ type Suggestion struct {
 }
 
 type Queue struct {
-	Date     string `json:"date"`
-	InfoHash string `json:"infohash"`
-	Retry    int    `json:"retry"`
+	InfoHash string    `json:"infohash"`
+	Date     time.Time `json:"date"`
+	Retry    int       `json:"retry"`
 }
 
 func Init() {

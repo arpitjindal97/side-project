@@ -4,24 +4,27 @@ const create_keyspace = `create keyspace if not exists awesome with replication 
 
 const create_torrent_by_infohash = `CREATE TABLE IF NOT EXISTS torrent_by_infohash (
     infohash text,
-    date timestamp,
     category text,
+    subcategory text,
+	comment text,
+	creator text,
+    date timestamp,
+    leechers int,
+    magnet text,
+    name text,
+	num_files int,
     peers int,
     seeders int,
-    leechers int,
     size text,
-    subcategory text,
-    title text,
-    magnet text,
     userid text,
 	PRIMARY KEY ((infohash), category, subcategory)
 	) WITH CLUSTERING ORDER BY (category ASC, subcategory ASC);`
 
 const create_queue_by_infohash = `CREATE TABLE IF NOT EXISTS queue_by_infohash (
-    date timestamp,
     infohash text,
+    date timestamp,
     retry int,
-	PRIMARY KEY (infohash));`
+	PRIMARY KEY (infohash) );`
 
 const create_suggestion_by_userid = `CREATE TABLE IF NOT EXISTS suggestion_by_userid (
     infohash text,
@@ -53,8 +56,10 @@ const create_user_by_userid = `CREATE TABLE IF NOT EXISTS user_by_userid (
 	email    text,
 	PRIMARY KEY (userid) );`
 
-const find_torrent_by_infohash = `SELECT * FROM torrent_by_infohash where infohash = ?`
+const find_torrent_by_infohash = `SELECT * FROM torrent_by_infohash where infohash=?`
 
 const insert_queue_by_infohash = `INSERT INTO queue_by_infohash (infohash,date,retry) values(?,?,?)`
 
-const find_queue_by_infohash = `SELECT * FROM queue_by_infohash (infohash,data,retry) values(?,?,?)`
+const find_queue_by_infohash = `SELECT * FROM queue_by_infohash where infohash=?`
+
+const update_torrent_by_infohash = `UPDATE torrent_by_infohash set peers=?,seeders=?,leechers=? where infohash=? and category=? and subcategory=?`

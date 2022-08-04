@@ -22,7 +22,7 @@ func main() {
 		DB:       0,  // use default DB
 	})
 
-	packetConn, err := net.ListenPacket("udp4", "0.0.0.0:8080")
+	packetConn, err := net.ListenPacket("udp4", ":1337")
 	if err != nil {
 		log.Fatal(err)
 	}

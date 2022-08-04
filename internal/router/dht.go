@@ -58,6 +58,7 @@ func onTorrent(infohash string, ip net.IP, port uint16) {
 }
 
 func NewDHTServer(id metainfo.Hash, addr string, pm dht.PeerManager) (s *dht.Server, err error) {
+
 	conn, err := net.ListenPacket("udp4", addr)
 	if err == nil {
 		c := dht.Config{ID: id, PeerManager: pm, OnSearch: onSearch, OnTorrent: onTorrent}

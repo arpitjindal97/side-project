@@ -14,17 +14,16 @@ func main() {
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
-	apiserver.RedisKey = "apiserver"
 	defer apiserver.Rdb.Close()
 
 	cassandra.Conn = cassandra.Cluster{
-		URL:      []string{"localhost"},
+		URL:      []string{"localhost:9042"},
 		KeySpace: "awesome",
 		Session:  nil,
 	}
 	cassandra.Init()
 	defer cassandra.Conn.Session.Close()
 
-	err := apiserver.StartHTTPServer("0.0.0.0:8081")
+	err := apiserver.StartHTTPServer("0.0.0.0:8080")
 	log.Printf("http server shutdown: %s", err)
 }

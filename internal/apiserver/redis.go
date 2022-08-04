@@ -2,41 +2,27 @@ package apiserver
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-redis/redis/v9"
 	"time"
 )
 
 var ctx = context.Background()
 var Rdb *redis.Client
-var RedisKey string
 
-func RedisCount(time string) (count int64) {
-	count, _ = Rdb.ZCount(ctx, RedisKey, "0", time).Result()
+func RedisCount() (count int64) {
+	count, _ = Rdb.DBSize(ctx).Result()
 	return
 }
 
-func RedisAdd(infohash string) int {
-	fmt.Println("writing to redis infohash: " + infohash)
-	value := redis.Z{
-		Score:  float64(time.Now().Unix()),
-		Member: infohash,
-	}
-	val, _ := Rdb.ZAddNX(ctx, RedisKey, value).Result()
-	return int(val)
+func RedisGet(infohash string) error {
+	_, err := Rdb.Get(ctx, infohash).Result()
+	return err
 }
 
-func RedisGet(time string, offset, count int64) (infohash []string) {
-	member := &redis.ZRangeBy{
-		Min:    "0",
-		Max:    time,
-		Offset: offset,
-		Count:  count,
-	}
-	infohash, _ = Rdb.ZRangeByScore(ctx, RedisKey, member).Result()
-	return
+func RedisSet(infohash string) {
+	_, _ = Rdb.SetNX(ctx, infohash, "anything", time.Minute*10).Result()
 }
 
 func RedisRemove(infohash string) {
-	Rdb.ZRem(ctx, RedisKey, infohash)
+	_, _ = Rdb.GetDel(ctx, infohash).Result()
 }

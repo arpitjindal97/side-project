@@ -1,17 +1,28 @@
 package cassandra
 
 import (
-	"fmt"
 	"github.com/gocql/gocql"
-	"github.com/xgfone/go-apiserver/http/reqresp"
-	"io/ioutil"
-	"net/http"
 	"time"
 )
 
 func FindTorrentByInfohash(id string) (Torrent, error) {
 	var torrent Torrent
-	err := Conn.Session.Query(find_torrent_by_infohash, id).Consistency(gocql.One).Scan(&torrent)
+	err := Conn.Session.Query(find_torrent_by_infohash, id).Consistency(gocql.One).Scan(
+		&torrent.InfoHash,
+		&torrent.Category,
+		&torrent.SubCategory,
+		&torrent.Comment,
+		&torrent.Creator,
+		&torrent.Date,
+		&torrent.Leechers,
+		&torrent.Magnet,
+		&torrent.Name,
+		&torrent.NumFiles,
+		&torrent.Peers,
+		&torrent.Seeders,
+		&torrent.Size,
+		&torrent.User,
+	)
 	return torrent, err
 }
 
@@ -20,33 +31,20 @@ func InsertQueueByInfohash(infohash string) error {
 }
 
 func FindQueueByInfohash(id string) (queue Queue, err error) {
-	err = Conn.Session.Query(find_queue_by_infohash, id).Consistency(gocql.One).Scan(&queue)
+	err = Conn.Session.Query(find_queue_by_infohash, id).Consistency(gocql.One).Scan(
+		&queue.InfoHash,
+		&queue.Date,
+		&queue.Retry,
+	)
 	return
 }
 
-func TorrentPost(route string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		c := reqresp.GetContext(w, r)
-
-		//str := fmt.Sprintf("%s", c.Body)
-
-		_, err := ioutil.ReadAll(c.Body)
-		if err != nil {
-			_, _ = fmt.Fprintf(w, "%s", err)
-			return
-		}
-
-		/*
-			var torrent Torrent
-			err := Conn.Session.Query(find_torrent_by_id, id).Consistency(gocql.One).Scan(&torrent)
-
-			err := json.Unmarshal(body, &torrent)
-			if err != nil {
-				_, _ = fmt.Fprintf(w, "%s", err)
-				return
-			}
-			_, _ = fmt.Fprintf(w, "%s", str)
-		*/
-		//_, _ = fmt.Fprintf(w, "%s: %s", route, infohash
-	}
+func UpdateTorrentByInfohashPeers(torrent Torrent) error {
+	return Conn.Session.Query(update_torrent_by_infohash,
+		torrent.Peers,
+		torrent.Seeders,
+		torrent.Leechers,
+		torrent.InfoHash,
+		torrent.Category,
+		torrent.SubCategory).Exec()
 }
