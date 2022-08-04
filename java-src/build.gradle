@@ -8,7 +8,7 @@ plugins {
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '18'
+sourceCompatibility = '16'
 
 repositories {
 	mavenCentral()
@@ -41,5 +41,6 @@ tasks.jacocoTestReport {
 }
 
 test {
-	systemProperty 'java.library.path','/Users/i353342/Downloads/lib/x86_64/'
+    def lib_path = System.getenv("LIB_PATH") ?: '/Users/i353342/Downloads/lib/x86_64/'
+	systemProperty 'java.library.path',lib_path
 }
