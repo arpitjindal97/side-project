@@ -9,9 +9,11 @@ import (
 func main() {
 
 	cassandra.Conn = cassandra.Cluster{
-		URL:      []string{"localhost"},
+		URL:      []string{"vergon-cassandra-0"},
 		KeySpace: "awesome",
 		Session:  nil,
+		Username: "cassandra",
+		Password: "vergon",
 	}
 	cassandra.Init()
 	defer cassandra.Conn.Session.Close()

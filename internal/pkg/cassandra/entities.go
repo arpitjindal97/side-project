@@ -11,6 +11,8 @@ type Cluster struct {
 	URL      []string
 	KeySpace string
 	Session  *gocql.Session
+	Username string
+	Password string
 }
 
 var Conn Cluster
@@ -54,6 +56,10 @@ type Queue struct {
 func Init() {
 	fmt.Println("Initializing Cassandra")
 	cluster := gocql.NewCluster(Conn.URL...)
+	cluster.Authenticator = gocql.PasswordAuthenticator{
+		Username: Conn.Username,
+		Password: Conn.Password,
+	}
 	cluster.Keyspace = Conn.KeySpace
 	cluster.Consistency = gocql.Quorum
 	Conn.Session, _ = cluster.CreateSession()

@@ -5,3 +5,8 @@ redis:
 
 provisionDataStore:
   elasticsearch: false
+
+cassandra:
+  dbUser:
+    user: cassandra
+    password: vergon

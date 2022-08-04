@@ -20,6 +20,8 @@ func main() {
 		URL:      []string{"vergon-cassandra:9042"},
 		KeySpace: "awesome",
 		Session:  nil,
+		Username: "cassandra",
+		Password: "vergon",
 	}
 	cassandra.Init()
 	defer cassandra.Conn.Session.Close()
