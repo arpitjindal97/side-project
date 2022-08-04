@@ -8,4 +8,3 @@ COPY ./ /work
 RUN go build ./cmd/apiserver
 RUN go build ./cmd/refresher
 RUN go build ./cmd/tracker
-

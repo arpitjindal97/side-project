@@ -21,9 +21,8 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build Script
-        run: |
-          bash ./build/builder.sh
+      - name: Builder Script
+        run: bash ./build/builder.sh
 
   Build_Java:
     name: Build Java Project
