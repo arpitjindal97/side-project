@@ -10,14 +10,14 @@ import (
 func main() {
 
 	apiserver.Rdb = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     "vergon-redis-master:6379",
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
 	defer apiserver.Rdb.Close()
 
 	cassandra.Conn = cassandra.Cluster{
-		URL:      []string{"localhost:9042"},
+		URL:      []string{"vergon-cassandra:9042"},
 		KeySpace: "awesome",
 		Session:  nil,
 	}

@@ -1,0 +1,7 @@
+
+redis:
+  replica:
+    replicaCount: 1
+
+provisionDataStore:
+  elasticsearch: false
