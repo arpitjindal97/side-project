@@ -47,6 +47,8 @@ func GetTorrentById(route string) http.HandlerFunc {
 			return
 		}
 
+		// https://pkg.go.dev/encoding/json#Marshal
+		// < > & will be escaped in magnet url
 		str, err := json.MarshalIndent(torrent, "", "    ")
 		if err != nil {
 			w.WriteHeader(502)
