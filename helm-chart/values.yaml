@@ -1,4 +1,8 @@
 
+global:
+  redis:
+    password: bhXvm2p7Xj
+
 redis:
   replica:
     replicaCount: 1

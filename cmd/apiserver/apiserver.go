@@ -11,8 +11,8 @@ func main() {
 
 	apiserver.Rdb = redis.NewClient(&redis.Options{
 		Addr:     "vergon-redis-master:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Password: "bhXvm2p7Xj", // no password set
+		DB:       0,            // use default DB
 	})
 	defer apiserver.Rdb.Close()
 
