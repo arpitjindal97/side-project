@@ -62,6 +62,9 @@ func Init() {
 	}
 	cluster.Keyspace = Conn.KeySpace
 	cluster.Consistency = gocql.Quorum
+	cluster.Timeout = time.Second * 3
+	cluster.WriteTimeout = time.Second * 3
+	cluster.ConnectTimeout = time.Second * 3
 	Conn.Session, _ = cluster.CreateSession()
 
 	CreateTables()
