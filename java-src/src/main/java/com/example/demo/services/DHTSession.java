@@ -11,7 +11,12 @@ import org.libtorrent4j.swig.settings_pack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Mono;
+import reactor.netty.ByteBufFlux;
+import reactor.netty.http.client.HttpClient;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -21,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class DHTSession {
 
-    Logger logger = LoggerFactory.getLogger(DHTSession.class);
+    static Logger logger = LoggerFactory.getLogger(DHTSession.class);
 
     @Bean
     public static SessionManager prepareSession() throws InterruptedException {
@@ -40,6 +45,7 @@ public class DHTSession {
                 if (alert.type() == AlertType.DHT_GET_PEERS) {
                     String id = ((DhtGetPeersAlert) alert).infoHash().toString();
                     System.out.println("Infohash: " + id);
+                    sendToAPIServer(id);
                 }
                 //System.out.println(alert);
             }
@@ -82,6 +88,26 @@ public class DHTSession {
             System.exit(0);
         }
         return s;
+    }
+
+    public static void sendToAPIServer(String infohash) {
+        Thread commandLineThread = new Thread(() -> {
+            String rawData = "{\"infohash\":\""+infohash+"\"}";
+            //String encodedData = URLEncoder.encode( rawData, StandardCharsets.UTF_8);
+
+            HttpClient client = HttpClient.create();
+            client.post()
+                    .uri("http://apiserver:8080"+"/torrents")
+                    .send(ByteBufFlux.fromString(Mono.just(rawData)))
+                    .responseContent()
+                    .onErrorStop()
+                    .flatMap(s -> ServerResponse.ok()
+                            .contentType(MediaType.TEXT_PLAIN)
+                            .bodyValue(s));
+
+        });
+        commandLineThread.setDaemon(true);
+        commandLineThread.start();
     }
 
 }
