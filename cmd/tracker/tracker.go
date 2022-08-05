@@ -17,10 +17,12 @@ func main() {
 	}
 
 	tracker.Rdb = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     "vergon-redis-master:6379",
+		Password: "bhXvm2p7Xj", // no password set
+		DB:       0,            // use default DB
 	})
+
+	tracker.APIServerURL = "http://apiserver:8080"
 
 	packetConn, err := net.ListenPacket("udp4", ":1337")
 	if err != nil {

@@ -1,10 +1,13 @@
 package tracker
 
 import (
+	"bytes"
+	"encoding/json"
 	"example.com/m/internal/pkg"
 	"github.com/xgfone/bt/metainfo"
 	"github.com/xgfone/bt/tracker/udptracker"
 	"net"
+	"net/http"
 )
 
 var OtherTrackers []string
@@ -20,7 +23,7 @@ type testHandler struct{}
 func (testHandler) OnConnect(raddr *net.UDPAddr) (err error) { return }
 
 func (testHandler) OnAnnounce(raddr *net.UDPAddr, req udptracker.AnnounceRequest) (r udptracker.AnnounceResponse, err error) {
-
+	go addTorrent(req.InfoHash.String())
 	RedisAdd(req.InfoHash.String(), req.Left, raddr.IP, req.Port)
 	r = udptracker.AnnounceResponse{
 		Interval:  120, // 2 mins
@@ -41,4 +44,14 @@ func (testHandler) OnScrap(raddr *net.UDPAddr, infohashes []metainfo.Hash) (
 		}
 	}
 	return
+}
+
+var APIServerURL string
+
+func addTorrent(infohash string) {
+	reqBody, _ := json.Marshal(map[string]string{
+		"infohash": infohash,
+	})
+
+	_, _ = http.Post(APIServerURL+"/torrents", "application/json", bytes.NewBuffer(reqBody))
 }

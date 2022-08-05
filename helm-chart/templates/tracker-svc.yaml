@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tracker
+  namespace: default
+spec:
+  ports:
+    - port: 1337
+      protocol: UDP
+      targetPort: 1337
+      nodePort: 31337
+  selector:
+    app: tracker
+  type: NodePort
