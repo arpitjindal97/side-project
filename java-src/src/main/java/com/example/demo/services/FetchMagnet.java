@@ -60,7 +60,11 @@ public class FetchMagnet {
         TorrentByInfohash torrent = fetchInfo(queue.getInfoHash());
         if (torrent == null) {
             queue.setRetry(queue.getRetry()+1);
-            queueByInfohashRepository.save(queue);
+            if (queue.getRetry() == 5) {
+                queueByInfohashRepository.delete(queue);
+            } else {
+                queueByInfohashRepository.save(queue);
+            }
             logger.error("Infohash "+queue.getInfoHash()+" failed");
             return;
         }
