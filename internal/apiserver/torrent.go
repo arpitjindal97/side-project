@@ -58,6 +58,8 @@ func GetTorrentById(route string) http.HandlerFunc {
 	}
 }
 
+var RefresherURL string
+
 func addTorrent(infohash string) {
 	if RedisGet(infohash) == nil {
 		// already in cache
@@ -70,7 +72,7 @@ func addTorrent(infohash string) {
 		// send to refresher
 		fmt.Println("Sending to refresher")
 		go func() {
-			_, _ = http.Get("http://localhost:8081/torrent/" + infohash)
+			_, _ = http.Get(RefresherURL + "/torrent/" + infohash)
 		}()
 	} else {
 		// check if it's already in queue

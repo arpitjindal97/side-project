@@ -26,6 +26,8 @@ func main() {
 	cassandra.Init()
 	defer cassandra.Conn.Session.Close()
 
+	apiserver.RefresherURL = "http://refresher:8081"
+
 	err := apiserver.StartHTTPServer("0.0.0.0:8080")
 	log.Printf("http server shutdown: %s", err)
 }
