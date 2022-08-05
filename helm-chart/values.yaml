@@ -2,15 +2,32 @@
 global:
   redis:
     password: bhXvm2p7Xj
+  kibanaEnabled: false
 
 redis:
   replica:
     replicaCount: 1
 
-provisionDataStore:
-  elasticsearch: false
 
 cassandra:
   dbUser:
     user: cassandra
     password: vergon
+
+provisionDataStore:
+  elasticsearch: true
+elasticsearch:
+  master:
+    masterOnly: false
+    replicaCount: 1
+    autoscaling:
+      minReplicas: 1
+      maxReplicas: 2
+    nodeSelector:
+      kubernetes.io/hostname: mattermost
+  data:
+    replicaCount: 0
+  ingest:
+    replicaCount: 0
+  coordinating:
+    replicaCount: 0
