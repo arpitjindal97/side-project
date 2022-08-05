@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: indexer-deployment
+spec:
+  selector:
+    matchLabels:
+      app: indexer
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: indexer
+    spec:
+      containers:
+        - name: indexer
+          image: arpitjindal1997/indexer:latest
+          ports:
+            - containerPort: 8082

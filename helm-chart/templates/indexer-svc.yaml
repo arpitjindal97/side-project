@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: indexer
+  namespace: default
+spec:
+  ports:
+    - port: 8082
+      protocol: TCP
+      targetPort: 8082
+      nodePort: 30003
+  selector:
+    app: indexer
+  type: ClusterIP

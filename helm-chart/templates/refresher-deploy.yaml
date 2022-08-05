@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: refresher-deployment
+spec:
+  selector:
+    matchLabels:
+      app: refresher
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: refresher
+    spec:
+      containers:
+        - name: refresher
+          image: arpitjindal1997/refresher:latest
+          ports:
+            - containerPort: 8081

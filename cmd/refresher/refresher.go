@@ -9,7 +9,7 @@ import (
 func main() {
 
 	cassandra.Conn = cassandra.Cluster{
-		URL:      []string{"vergon-cassandra-0"},
+		URL:      []string{"vergon-cassandra"},
 		KeySpace: "awesome",
 		Session:  nil,
 		Username: "cassandra",
