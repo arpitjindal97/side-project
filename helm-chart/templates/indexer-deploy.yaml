@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: indexer-deployment
+  name: indexer
 spec:
   selector:
     matchLabels:
       app: indexer
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: refresher-deployment
+  name: refresher
 spec:
   selector:
     matchLabels:
