@@ -8,7 +8,6 @@ spec:
     - port: 8082
       protocol: TCP
       targetPort: 8082
-      nodePort: 30003
   selector:
     app: indexer
   type: ClusterIP
