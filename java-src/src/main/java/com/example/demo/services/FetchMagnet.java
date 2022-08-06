@@ -2,6 +2,8 @@ package com.example.demo.services;
 
 import com.example.demo.daos.QueueByInfohashRepository;
 import com.example.demo.daos.TorrentByInfohashRepository;
+import com.example.demo.daos.TorrentIndexRepository;
+import com.example.demo.documents.Torrent;
 import com.example.demo.entities.QueueByInfohash;
 import com.example.demo.entities.TorrentByInfohash;
 import org.libtorrent4j.*;
@@ -20,13 +22,18 @@ public class FetchMagnet {
     QueueByInfohashRepository queueByInfohashRepository;
     SessionManager sessionManager;
     TorrentByInfohashRepository torrentByInfohashRepository;
+    TorrentIndexRepository torrentIndexRepository;
 
     Logger logger = LoggerFactory.getLogger(FetchMagnet.class);
 
-    public FetchMagnet(QueueByInfohashRepository queueByInfohashRepository, TorrentByInfohashRepository torrentByInfohashRepository, SessionManager s) {
+    public FetchMagnet(QueueByInfohashRepository queueByInfohashRepository,
+                       TorrentByInfohashRepository torrentByInfohashRepository,
+                       TorrentIndexRepository torrentIndexRepository,
+                       SessionManager s) {
         this.queueByInfohashRepository = queueByInfohashRepository;
         this.sessionManager = s;
         this.torrentByInfohashRepository = torrentByInfohashRepository;
+        this.torrentIndexRepository = torrentIndexRepository;
     }
 
     /*
@@ -77,6 +84,7 @@ public class FetchMagnet {
         } else {
             torrentByInfohashRepository.save(torrent);
             queueByInfohashRepository.delete(queue);
+            saveToElasticSearch(torrent);
             logger.info("Saved into Database");
         }
     }
@@ -120,5 +128,27 @@ public class FetchMagnet {
             logger.error(e.getMessage() + infohash);
         }
         return null;
+    }
+
+    public void saveToElasticSearch(TorrentByInfohash torrentByInfohash) {
+        Torrent document = new Torrent();
+
+        document.setInfohash(torrentByInfohash.getKey().getInfohash());
+        document.setCategory(torrentByInfohash.getKey().getCategory());
+        document.setSubcategory(torrentByInfohash.getKey().getSubcategory());
+
+        document.setComment(torrentByInfohash.getKey().getSubcategory());
+        document.setCreator(torrentByInfohash.getKey().getSubcategory());
+        document.setDate(torrentByInfohash.getDate());
+        document.setLeechers(torrentByInfohash.getLeechers());
+        document.setMagnet(torrentByInfohash.getMagnet());
+        document.setName(torrentByInfohash.getName());
+        document.setNumFiles(torrentByInfohash.getNumFiles());
+        document.setPeers(torrentByInfohash.getPeers());
+        document.setSeeders(torrentByInfohash.getSeeders());
+        document.setSize(torrentByInfohash.getSize());
+        document.setUserid(torrentByInfohash.getUserid());
+
+        torrentIndexRepository.save(document);
     }
 }

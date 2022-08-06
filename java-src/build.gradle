@@ -18,6 +18,7 @@ dependencies {
 	implementation 'org.libtorrent4j:libtorrent4j:2.0.6-26'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-cassandra-reactive'
+	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
@@ -25,6 +26,7 @@ dependencies {
 	testImplementation 'io.projectreactor:reactor-test'
 
 	testImplementation 'org.testcontainers:testcontainers:1.17.2'
+	testImplementation 'org.testcontainers:elasticsearch:1.17.3'
 	testImplementation 'org.testcontainers:cassandra:1.17.2'
 	testImplementation 'org.testcontainers:junit-jupiter:1.17.2'
 }
