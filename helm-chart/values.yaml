@@ -35,6 +35,8 @@ provisionDataStore:
   elasticsearch: true
 
 elasticsearch:
+  image:
+    tag: 7.17.5
   master:
     masterOnly: false
     replicaCount: 1

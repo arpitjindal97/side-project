@@ -4,16 +4,14 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+import org.springframework.context.annotation.Lazy;
 import org.testcontainers.containers.CassandraContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.TestcontainersConfiguration;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -26,11 +24,12 @@ class DemoApplicationTests {
 			.withExposedPorts(9042);
 
 	@Container
-	private static ElasticsearchContainer esContainer = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:8.3.3")
+	private static ElasticsearchContainer esContainer = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:7.17.5")
 			.withExposedPorts(9200)
 			.withEnv("ELASTIC_PASSWORD","password")
 			.withEnv("xpack.security.http.ssl.enabled","false")
 			.withEnv("discovery.type","single-node");
+
 
 	@BeforeAll
 	static void setupCassandraConnectionProperties() {
@@ -60,4 +59,12 @@ class DemoApplicationTests {
 	void contextLoads() {
 	}
 
+	@Lazy
+	@Autowired
+	ElasticRepositoryTest elasticRepositoryTest;
+
+	@Test
+	void ElasticSearchTest() {
+		elasticRepositoryTest.crudOperationElastic();
+	}
 }
