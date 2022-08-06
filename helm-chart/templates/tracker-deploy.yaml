@@ -12,6 +12,8 @@ spec:
       labels:
         app: tracker
     spec:
+      affinity:
+        {{- .Values.vergon.affinityNotMaster | toYaml | nindent 8 }}
       containers:
         - name: tracker
           image: arpitjindal1997/tracker:latest

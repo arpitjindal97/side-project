@@ -12,6 +12,8 @@ spec:
       labels:
         app: apiserver
     spec:
+      affinity:
+        {{- .Values.vergon.affinityNotMaster | toYaml | nindent 8 }}
       containers:
         - name: apiserver
           image: arpitjindal1997/apiserver:latest

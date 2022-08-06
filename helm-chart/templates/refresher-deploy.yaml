@@ -12,6 +12,8 @@ spec:
       labels:
         app: refresher
     spec:
+      affinity:
+        {{- .Values.vergon.affinityNotMaster | toYaml | nindent 8 }}
       containers:
         - name: refresher
           image: arpitjindal1997/refresher:latest

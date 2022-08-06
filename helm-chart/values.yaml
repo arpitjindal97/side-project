@@ -4,18 +4,36 @@ global:
     password: bhXvm2p7Xj
   kibanaEnabled: false
 
+vergon:
+  affinityNotMaster: &affinityNotMaster
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: NotIn
+            values:
+            - arpit-server
+
 redis:
   replica:
     replicaCount: 1
-
+    affinity:
+      *affinityNotMaster
+  master:
+    affinity:
+      *affinityNotMaster
 
 cassandra:
   dbUser:
     user: cassandra
     password: vergon
+  nodeSelector:
+    kubernetes.io/hostname: arpit-server
 
 provisionDataStore:
   elasticsearch: true
+
 elasticsearch:
   master:
     masterOnly: false
@@ -23,11 +41,14 @@ elasticsearch:
     autoscaling:
       minReplicas: 1
       maxReplicas: 2
-    nodeSelector:
-      kubernetes.io/hostname: mattermost
+    affinity:
+      *affinityNotMaster
   data:
     replicaCount: 0
   ingest:
     replicaCount: 0
   coordinating:
     replicaCount: 0
+  security:
+    elasticPassword: password
+

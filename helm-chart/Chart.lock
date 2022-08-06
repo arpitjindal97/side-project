@@ -1,0 +1,12 @@
+dependencies:
+- name: elasticsearch
+  repository: https://charts.bitnami.com/bitnami
+  version: 19.1.6
+- name: cassandra
+  repository: https://charts.bitnami.com/bitnami
+  version: 9.2.11
+- name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 17.0.8
+digest: sha256:f232a6cb7180c01925e07cd9384d3bc701b221caa14f0b45bfb09cde28043161
+generated: "2022-08-06T20:13:12.727758+05:30"
