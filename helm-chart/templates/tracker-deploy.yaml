@@ -17,5 +17,6 @@ spec:
       containers:
         - name: tracker
           image: arpitjindal1997/tracker:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 1337

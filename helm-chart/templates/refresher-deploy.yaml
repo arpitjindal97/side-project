@@ -17,5 +17,6 @@ spec:
       containers:
         - name: refresher
           image: arpitjindal1997/refresher:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8081

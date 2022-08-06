@@ -17,5 +17,6 @@ spec:
       containers:
         - name: indexer
           image: arpitjindal1997/indexer:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8082

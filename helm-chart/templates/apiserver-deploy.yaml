@@ -17,5 +17,6 @@ spec:
       containers:
         - name: apiserver
           image: arpitjindal1997/apiserver:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080

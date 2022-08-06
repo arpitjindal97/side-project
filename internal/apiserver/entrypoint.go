@@ -28,11 +28,12 @@ func getRouter() *router.Router {
 	routeManager.
 		Path("/torrents").Method("POST").
 		HandlerFunc(PostTorrentById("PostTorrentById"))
-	/*
-		routeManager.
-			Path("/torrents/{id}").Method("GET").
-			HandlerFunc(storegateway.TorrentFindById("torrent_findByIdTorrent"))
 
+	routeManager.
+		Path("/search/{query}").Method("GET").
+		HandlerFunc(SearchQuery("SearchQuery"))
+
+	/*
 		routeManager.
 			Path("/torrents/search/findByInfoHashEquals").Method("GET").
 			HandlerFunc(storegateway.TorrentFindByInfoHashEquals("torrent_findByInfoHashEquals"))
