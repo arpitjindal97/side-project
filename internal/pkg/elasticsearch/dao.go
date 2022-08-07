@@ -1,7 +1,12 @@
 package elasticsearch
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"example.com/m/internal/pkg/cassandra"
+	"fmt"
+	"github.com/elastic/go-elasticsearch/v7/esapi"
 	"io/ioutil"
 )
 
@@ -19,4 +24,18 @@ func Search(query string) ([]byte, error) {
 
 	//log.Println(elasticsearch.Version)
 	//log.Println(es.Info())
+}
+
+func Update(torrent cassandra.Torrent) {
+	body, _ := json.Marshal(torrent)
+	request := esapi.UpdateRequest{
+		Index:      index,
+		DocumentID: torrent.InfoHash,
+		Body:       bytes.NewReader([]byte(fmt.Sprintf(`{"doc":%s}`, body))),
+	}
+	res, err := request.Do(context.Background(), es)
+	if err != nil {
+		_ = fmt.Errorf("update: request: %w", err)
+	}
+	defer res.Body.Close()
 }

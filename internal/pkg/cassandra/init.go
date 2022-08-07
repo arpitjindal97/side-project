@@ -10,7 +10,7 @@ import (
 var Session *gocql.Session
 
 func Init(uris []string, username, password, keyspace string) {
-	fmt.Println("Initializing Cassandra")
+	log.Println("Initializing Cassandra")
 	cluster := gocql.NewCluster(uris...)
 	cluster.Authenticator = gocql.PasswordAuthenticator{
 		Username: username,
@@ -24,7 +24,7 @@ func Init(uris []string, username, password, keyspace string) {
 	Session, _ = cluster.CreateSession()
 
 	CreateTables()
-	fmt.Println("Cassandra Session is ready")
+	log.Println("Cassandra Session is ready")
 }
 
 func CreateTables() {

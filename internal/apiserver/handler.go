@@ -5,6 +5,7 @@ import (
 	"errors"
 	"example.com/m/internal/pkg"
 	"example.com/m/internal/pkg/cassandra"
+	"example.com/m/internal/pkg/elasticsearch"
 	"fmt"
 	"github.com/xgfone/go-apiserver/http/reqresp"
 	"io/ioutil"
@@ -31,7 +32,7 @@ func PostTorrentById(route string) http.HandlerFunc {
 
 		w.WriteHeader(200)
 		go addTorrent(queue.InfoHash)
-		_, _ = fmt.Fprintf(w, "successfully processed request")
+		_, _ = fmt.Fprintf(w, pkg.JsonMessage("Successfully received submission"))
 	}
 }
 
@@ -60,28 +61,11 @@ func GetTorrentById(route string) http.HandlerFunc {
 	}
 }
 
-var RefresherURL string
-
-func addTorrent(infohash string) {
-	if RedisGet(infohash) == nil {
-		// already in cache
-		return
-	}
-	RedisSet(infohash)
-	_, err := cassandra.FindTorrentByInfohash(infohash)
-	if err == nil {
-		// already indexed
-		// send to refresher
-		fmt.Println("Sending to refresher")
-		go func() {
-			_, _ = http.Get(RefresherURL + "/torrent/" + infohash)
-		}()
-	} else {
-		// check if it's already in queue
-		_, err = cassandra.FindQueueByInfohash(infohash)
-		if err != nil {
-			// was not present in queue
-			_ = cassandra.InsertQueueByInfohash(infohash)
-		}
+func SearchQuery(route string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		c := reqresp.GetContext(w, r)
+		query := c.GetQuery("q")
+		data, _ := elasticsearch.Search(query)
+		_, _ = w.Write(data)
 	}
 }

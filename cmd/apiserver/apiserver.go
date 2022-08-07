@@ -11,6 +11,7 @@ import (
 func main() {
 
 	// Redis Setup
+	log.Println("Initializin")
 	apiserver.Rdb = redis.NewClient(&redis.Options{
 		Addr:     "vergon-redis-master:6379",
 		Password: "bhXvm2p7Xj", // no password set

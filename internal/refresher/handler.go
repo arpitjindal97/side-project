@@ -4,6 +4,7 @@ import (
 	"context"
 	"example.com/m/internal/pkg"
 	"example.com/m/internal/pkg/cassandra"
+	"example.com/m/internal/pkg/elasticsearch"
 	"fmt"
 	"github.com/xgfone/bt/metainfo"
 	"github.com/xgfone/bt/tracker/udptracker"
@@ -73,4 +74,5 @@ func getResult(torrent cassandra.Torrent) {
 	torrent.Seeders = int(seeders)
 	torrent.Leechers = int(leechers)
 	_ = cassandra.UpdateTorrentByInfohashPeers(torrent)
+	elasticsearch.Update(torrent)
 }

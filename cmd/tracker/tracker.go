@@ -16,11 +16,14 @@ func main() {
 		"udp://tracker.opentrackr.org:1337/announce",
 	}
 
+	// Redis Setup
+	log.Println("Initializing Redis")
 	tracker.Rdb = redis.NewClient(&redis.Options{
 		Addr:     "vergon-redis-master:6379",
 		Password: "bhXvm2p7Xj", // no password set
 		DB:       0,            // use default DB
 	})
+	defer tracker.Rdb.Close()
 
 	tracker.APIServerURL = "http://apiserver:8080"
 
