@@ -44,7 +44,7 @@ public class DHTSession {
             public void alert(Alert<?> alert) {
                 if (alert.type() == AlertType.DHT_GET_PEERS) {
                     String id = ((DhtGetPeersAlert) alert).infoHash().toString();
-                    System.out.println("Infohash: " + id);
+                    //System.out.println("Infohash: " + id);
                     sendToAPIServer(id);
                 }
                 //System.out.println(alert);

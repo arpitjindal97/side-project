@@ -27,7 +27,7 @@ public class TorrentByInfohash {
     Integer peers;
     Integer seeders;
     Integer leechers;
-    String size;
+    Long size;
     String magnet;
     String userid;
     String comment;

@@ -55,7 +55,7 @@ public class Torrent {
     private Integer seeders;
 
     @Field(type = FieldType.Long)
-    private String size;
+    private Long size;
 
     @Field(type = FieldType.Keyword)
     private String userid;

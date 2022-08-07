@@ -52,5 +52,6 @@ elasticsearch:
   coordinating:
     replicaCount: 0
   security:
+    enabled: false
     elasticPassword: password
 

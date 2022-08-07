@@ -3,12 +3,14 @@ package main
 import (
 	"example.com/m/internal/apiserver"
 	"example.com/m/internal/pkg/cassandra"
+	"example.com/m/internal/pkg/elasticsearch"
 	"github.com/go-redis/redis/v9"
 	"log"
 )
 
 func main() {
 
+	// Redis Setup
 	apiserver.Rdb = redis.NewClient(&redis.Options{
 		Addr:     "vergon-redis-master:6379",
 		Password: "bhXvm2p7Xj", // no password set
@@ -16,15 +18,22 @@ func main() {
 	})
 	defer apiserver.Rdb.Close()
 
-	cassandra.Conn = cassandra.Cluster{
-		URL:      []string{"vergon-cassandra:9042"},
-		KeySpace: "awesome",
-		Session:  nil,
-		Username: "cassandra",
-		Password: "vergon",
-	}
-	cassandra.Init()
-	defer cassandra.Conn.Session.Close()
+	// Cassandra Setup
+	cassandra.Init(
+		[]string{"vergon-cassandra:9042"},
+		"cassandra",
+		"vergon",
+		"awesome",
+	)
+	defer cassandra.Session.Close()
+
+	// ElasticSearch Setup
+	elasticsearch.Init(
+		[]string{"http://vergon-elasticsearch:9200", "http://localhost:9200"},
+		"elastic",
+		"password",
+		"torrents",
+	)
 
 	apiserver.RefresherURL = "http://refresher:8081"
 

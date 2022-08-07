@@ -30,7 +30,7 @@ func getRouter() *router.Router {
 		HandlerFunc(PostTorrentById("PostTorrentById"))
 
 	routeManager.
-		Path("/search/{query}").Method("GET").
+		Path("/search").Method("GET").
 		HandlerFunc(SearchQuery("SearchQuery"))
 
 	/*

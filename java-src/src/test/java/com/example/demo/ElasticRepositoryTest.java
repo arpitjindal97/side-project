@@ -26,7 +26,7 @@ class ElasticRepositoryTest {
 		torrent.setSubcategory("Others");
 		torrent.setName("Sample Name");
 		torrent.setNumFiles(15);
-		torrent.setSize("1024");
+		torrent.setSize(1024L);
 		torrent.setComment("Test Comment");
 		torrent.setCreator("Anonymous");
 		torrent.setSeeders(0);

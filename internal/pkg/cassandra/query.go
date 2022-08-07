@@ -15,7 +15,7 @@ const create_torrent_by_infohash = `CREATE TABLE IF NOT EXISTS torrent_by_infoha
 	num_files int,
     peers int,
     seeders int,
-    size text,
+    size bigint,
     userid text,
 	PRIMARY KEY ((infohash), category, subcategory)
 	) WITH CLUSTERING ORDER BY (category ASC, subcategory ASC);`

@@ -113,7 +113,7 @@ public class FetchMagnet {
                 torrent.setKey(key);
                 torrent.setName(torrentInfo.name());
                 torrent.setNumFiles(torrentInfo.numFiles());
-                torrent.setSize(torrentInfo.totalSize()+"");
+                torrent.setSize(torrentInfo.totalSize());
                 torrent.setComment(torrentInfo.comment());
                 torrent.setCreator(torrentInfo.creator());
                 torrent.setSeeders(0);
@@ -137,8 +137,8 @@ public class FetchMagnet {
         document.setCategory(torrentByInfohash.getKey().getCategory());
         document.setSubcategory(torrentByInfohash.getKey().getSubcategory());
 
-        document.setComment(torrentByInfohash.getKey().getSubcategory());
-        document.setCreator(torrentByInfohash.getKey().getSubcategory());
+        document.setComment(torrentByInfohash.getComment());
+        document.setCreator(torrentByInfohash.getCreator());
         document.setDate(torrentByInfohash.getDate());
         document.setLeechers(torrentByInfohash.getLeechers());
         document.setMagnet(torrentByInfohash.getMagnet());
