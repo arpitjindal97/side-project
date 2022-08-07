@@ -15,6 +15,7 @@ import (
 func PostTorrentById(route string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		c := reqresp.GetContext(w, r)
+		w.Header().Set("Content-Type", "application/json")
 		body, err := ioutil.ReadAll(c.Body)
 		if err != nil {
 			w.WriteHeader(502)
@@ -41,6 +42,7 @@ func GetTorrentById(route string) http.HandlerFunc {
 		c := reqresp.GetContext(w, r)
 		id := fmt.Sprintf("%s", c.Data["id"])
 
+		w.Header().Set("Content-Type", "application/json")
 		torrent, err := cassandra.FindTorrentByInfohash(id)
 		if err != nil {
 			w.WriteHeader(404)
@@ -66,6 +68,7 @@ func SearchQuery(route string) http.HandlerFunc {
 		c := reqresp.GetContext(w, r)
 		query := c.GetQuery("q")
 		data, _ := elasticsearch.Search(query)
+		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write(data)
 	}
 }

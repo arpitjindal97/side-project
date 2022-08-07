@@ -24,6 +24,7 @@ var ActiveCount int
 func UpdatePeers(route string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		c := reqresp.GetContext(w, r)
+		w.Header().Set("Content-Type", "application/json")
 		id := fmt.Sprintf("%s", c.Data["id"])
 
 		torrent, err := cassandra.FindTorrentByInfohash(id)
@@ -35,7 +36,7 @@ func UpdatePeers(route string) http.HandlerFunc {
 
 		go getResult(torrent)
 
-		_, _ = fmt.Fprintf(w, "%s", "Done")
+		_, _ = fmt.Fprintf(w, "%s", pkg.JsonMessage("processed"))
 		//_, _ = fmt.Fprintf(w, "%s: %s", route, infohash
 	}
 }

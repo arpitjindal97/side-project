@@ -1,7 +1,6 @@
 package cassandra
 
 import (
-	"fmt"
 	"github.com/gocql/gocql"
 	"log"
 	"time"
@@ -29,33 +28,33 @@ func Init(uris []string, username, password, keyspace string) {
 
 func CreateTables() {
 
-	fmt.Println("Creating Table torrent_by_infohash")
+	log.Println("Creating Table torrent_by_infohash")
 	var err error
 	if err = Session.Query(create_torrent_by_infohash).Exec(); err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Creating Table queue_by_infohash")
+	log.Println("Creating Table queue_by_infohash")
 	if err = Session.Query(create_queue_by_infohash).Exec(); err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Creating Table suggestion_by_userid")
+	log.Println("Creating Table suggestion_by_userid")
 	if err = Session.Query(create_suggestion_by_userid).Exec(); err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Creating Table suggestion_by_infohash")
+	log.Println("Creating Table suggestion_by_infohash")
 	if err = Session.Query(create_suggestion_by_infohash).Exec(); err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Creating Table suggestion_by_date")
+	log.Println("Creating Table suggestion_by_date")
 	if err = Session.Query(create_suggestion_by_date).Exec(); err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Creating Table suggestion_by_userid")
+	log.Println("Creating Table suggestion_by_userid")
 	if err = Session.Query(create_user_by_userid).Exec(); err != nil {
 		log.Fatal(err)
 	}
