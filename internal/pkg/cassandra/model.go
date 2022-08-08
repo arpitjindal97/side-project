@@ -7,7 +7,6 @@ import (
 type Torrent struct {
 	InfoHash    string    `json:"infohash"`
 	Category    string    `json:"category"`
-	SubCategory string    `json:"subcategory"`
 	Comment     string    `json:"comment"`
 	Creator     string    `json:"creator"`
 	Date        time.Time `json:"date"`
@@ -18,6 +17,7 @@ type Torrent struct {
 	Peers       int       `json:"peers"`
 	Seeders     int       `json:"seeders"`
 	Size        int64     `json:"size"`
+	SubCategory string    `json:"subcategory"`
 	User        string    `json:"userid"`
 }
 

@@ -24,9 +24,6 @@ public class Torrent {
     @Field(type = FieldType.Keyword)
     private String category;
 
-    @Field(type = FieldType.Keyword)
-    private String subcategory;
-
     @Field(type = FieldType.Text)
     private String comment;
 
@@ -56,6 +53,9 @@ public class Torrent {
 
     @Field(type = FieldType.Long)
     private Long size;
+
+    @Field(type = FieldType.Keyword)
+    private String subcategory;
 
     @Field(type = FieldType.Keyword)
     private String userid;

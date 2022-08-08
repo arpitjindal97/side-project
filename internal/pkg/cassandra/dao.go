@@ -10,7 +10,6 @@ func FindTorrentByInfohash(id string) (Torrent, error) {
 	err := Session.Query(find_torrent_by_infohash, id).Consistency(gocql.One).Scan(
 		&torrent.InfoHash,
 		&torrent.Category,
-		&torrent.SubCategory,
 		&torrent.Comment,
 		&torrent.Creator,
 		&torrent.Date,
@@ -21,6 +20,7 @@ func FindTorrentByInfohash(id string) (Torrent, error) {
 		&torrent.Peers,
 		&torrent.Seeders,
 		&torrent.Size,
+		&torrent.SubCategory,
 		&torrent.User,
 	)
 	return torrent, err
@@ -44,7 +44,5 @@ func UpdateTorrentByInfohashPeers(torrent Torrent) error {
 		torrent.Peers,
 		torrent.Seeders,
 		torrent.Leechers,
-		torrent.InfoHash,
-		torrent.Category,
-		torrent.SubCategory).Exec()
+		torrent.InfoHash).Exec()
 }

@@ -77,10 +77,11 @@ public class FetchMagnet {
         }
         logger.info("Successfully fetched "+queue.getInfoHash());
 
-        TorrentByInfohash duplicate = this.torrentByInfohashRepository.findByInfohashEquals(torrent.getKey().getInfohash());
+        TorrentByInfohash duplicate = this.torrentByInfohashRepository.findByInfohashEquals(torrent.getInfohash());
 
         if (duplicate != null) {
             logger.error("Infohash "+queue.getInfoHash()+" already exists on database");
+            queueByInfohashRepository.delete(queue);
         } else {
             torrentByInfohashRepository.save(torrent);
             queueByInfohashRepository.delete(queue);
@@ -106,11 +107,9 @@ public class FetchMagnet {
                 torrentInfo.addTracker("udp://tracker.openbittorrent.com:6969",1);
                 torrentInfo.addTracker("udp://tracker.coppersurfer.tk:6969/announce",2);
 
-                TorrentByInfohash.TorrentByInfohashKey key = new TorrentByInfohash.TorrentByInfohashKey();
-                key.setInfohash(torrentInfo.infoHash().toString());
-                key.setCategory("Others");
-                key.setSubcategory("Others");
-                torrent.setKey(key);
+                torrent.setInfohash(torrentInfo.infoHash().toString());
+                torrent.setCategory("Others");
+                torrent.setSubcategory("Others");
                 torrent.setName(torrentInfo.name());
                 torrent.setNumFiles(torrentInfo.numFiles());
                 torrent.setSize(torrentInfo.totalSize());
@@ -133,10 +132,9 @@ public class FetchMagnet {
     public void saveToElasticSearch(TorrentByInfohash torrentByInfohash) {
         Torrent document = new Torrent();
 
-        document.setInfohash(torrentByInfohash.getKey().getInfohash());
-        document.setCategory(torrentByInfohash.getKey().getCategory());
-        document.setSubcategory(torrentByInfohash.getKey().getSubcategory());
-
+        document.setInfohash(torrentByInfohash.getInfohash());
+        document.setCategory(torrentByInfohash.getCategory());
+        document.setSubcategory(torrentByInfohash.getSubcategory());
         document.setComment(torrentByInfohash.getComment());
         document.setCreator(torrentByInfohash.getCreator());
         document.setDate(torrentByInfohash.getDate());
