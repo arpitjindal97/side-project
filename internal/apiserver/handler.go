@@ -10,6 +10,7 @@ import (
 	"github.com/xgfone/go-apiserver/http/reqresp"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 func PostTorrentById(route string) http.HandlerFunc {
@@ -67,7 +68,16 @@ func SearchQuery(route string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		c := reqresp.GetContext(w, r)
 		query := c.GetQuery("q")
-		data, _ := elasticsearch.Search(query)
+		sort := c.GetQuery("sort")
+		size, err := strconv.Atoi(c.GetQuery("size"))
+		if err != nil {
+			size = 10
+		}
+		from, _ := strconv.Atoi(c.GetQuery("from"))
+		if err != nil {
+			from = 0
+		}
+		data, _ := elasticsearch.Search(query, sort, size, from)
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write(data)
 	}

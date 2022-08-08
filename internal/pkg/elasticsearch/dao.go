@@ -10,12 +10,15 @@ import (
 	"io/ioutil"
 )
 
-func Search(query string) ([]byte, error) {
+func Search(query, sort string, size, from int) ([]byte, error) {
 
 	res, _ := es.Search(
 		es.Search.WithContext(context.Background()),
 		es.Search.WithIndex(index),
 		es.Search.WithQuery(query),
+		es.Search.WithSort(sort),
+		es.Search.WithFrom(from),
+		es.Search.WithSize(size),
 		es.Search.WithPretty(),
 		es.Search.WithSourceExcludes("_class"),
 	)
