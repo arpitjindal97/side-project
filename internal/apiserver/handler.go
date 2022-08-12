@@ -117,7 +117,6 @@ func SearchQuery(route string) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 		_, _ = w.Write(data)
-
 		labeler.Add(semconv.HTTPStatusCodeKey.Int(200))
 	}
 }

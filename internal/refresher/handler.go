@@ -9,6 +9,8 @@ import (
 	"github.com/xgfone/bt/metainfo"
 	"github.com/xgfone/bt/tracker/udptracker"
 	"github.com/xgfone/go-apiserver/http/reqresp"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
 	"net/http"
 	"time"
 )
@@ -23,6 +25,8 @@ var ActiveCount int
 
 func UpdatePeers(route string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		labeler, _ := otelhttp.LabelerFromContext(r.Context())
+		labeler.Add(semconv.HTTPRouteKey.String(route))
 		c := reqresp.GetContext(w, r)
 		w.Header().Set("Content-Type", "application/json")
 		id := fmt.Sprintf("%s", c.Data["id"])
@@ -30,6 +34,7 @@ func UpdatePeers(route string) http.HandlerFunc {
 		torrent, err := cassandra.FindTorrentByInfohash(id)
 		if err != nil {
 			w.WriteHeader(404)
+			labeler.Add(semconv.HTTPStatusCodeKey.Int(404))
 			_, _ = fmt.Fprintf(w, "%s", utils.JsonError(err))
 			return
 		}
@@ -38,6 +43,7 @@ func UpdatePeers(route string) http.HandlerFunc {
 
 		_, _ = fmt.Fprintf(w, "%s", utils.JsonMessage("processed"))
 		//_, _ = fmt.Fprintf(w, "%s: %s", route, infohash
+		labeler.Add(semconv.HTTPStatusCodeKey.Int(200))
 	}
 }
 

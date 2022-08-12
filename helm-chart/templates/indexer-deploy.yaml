@@ -9,6 +9,8 @@ spec:
   replicas: 2
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
       labels:
         app: indexer
     spec:
