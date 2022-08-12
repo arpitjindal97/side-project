@@ -1,15 +1,21 @@
 package apiserver
 
 import (
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+	goprom "github.com/prometheus/client_golang/prometheus"
 	"github.com/xgfone/go-apiserver/entrypoint"
-	"github.com/xgfone/go-apiserver/http/middlewares"
 	"github.com/xgfone/go-apiserver/http/router"
 	"github.com/xgfone/go-apiserver/http/router/routes/ruler"
+	"github.com/xgfone/go-opentelemetry"
+	"github.com/xgfone/go-opentelemetry/jaegerexporter"
+	"github.com/xgfone/go-opentelemetry/otelhttpx"
+	"github.com/xgfone/go-opentelemetry/promexporter"
+	"go.opentelemetry.io/contrib/instrumentation/runtime"
+	"time"
 )
 
 // StartHTTPServer is a simple convenient function to start a http server.
 func StartHTTPServer(addr string) (err error) {
+
 	handler := getRouter()
 	ep, err := entrypoint.NewEntryPoint("apiserver", addr, handler)
 	if err == nil {
@@ -23,27 +29,28 @@ func getRouter() *router.Router {
 
 	routeManager.
 		Path("/torrents/{id}").Method("GET").
-		HandlerFunc(GetTorrentById("GetTorrentById"))
+		Handler(otelhttpx.Handler(GetTorrentById("/torrents/{id}"), ""))
 
 	routeManager.
 		Path("/torrents").Method("POST").
-		HandlerFunc(PostTorrentById("PostTorrentById"))
+		Handler(otelhttpx.Handler(PostTorrentById("/torrents"), ""))
 
 	routeManager.
 		Path("/search").Method("GET").
-		HandlerFunc(SearchQuery("SearchQuery"))
+		Handler(otelhttpx.Handler(SearchQuery("/search"), ""))
 
-	/*
-		routeManager.
-			Path("/torrents/search/findByInfoHashEquals").Method("GET").
-			HandlerFunc(storegateway.TorrentFindByInfoHashEquals("torrent_findByInfoHashEquals"))
-	*/
-
+	registry := goprom.DefaultRegisterer.(*goprom.Registry)
 	routeManager.Path("/metrics").Method("GET").
-		Handler(promhttp.Handler())
+		Handler(promexporter.Handler(registry))
 
-	router := router.NewRouter(routeManager)
-	router.Middlewares.Use(middlewares.Context(0)) // Add Context to support path parameters
-	router.Middlewares.Use(middlewares.Logger(1), middlewares.Recover(2))
-	return router
+	opentelemetry.SetServiceName("apiserver")
+	jaegerexporter.Install(nil, nil)
+	promexporter.Install(registry)
+	otelhttpx.InstallClient()
+	runtime.Start(runtime.WithMinimumReadMemStatsInterval(time.Second))
+
+	newDefaultRouter := router.NewDefaultRouter(routeManager)
+	//router.Middlewares.Use(middlewares.Context(0)) // Add Context to support path parameters
+	//router.Middlewares.Use(middlewares.Logger(1), middlewares.Recover(2))
+	return newDefaultRouter
 }

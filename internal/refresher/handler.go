@@ -2,9 +2,9 @@ package refresher
 
 import (
 	"context"
-	"example.com/m/internal/pkg"
 	"example.com/m/internal/pkg/cassandra"
 	"example.com/m/internal/pkg/elasticsearch"
+	"example.com/m/internal/pkg/utils"
 	"fmt"
 	"github.com/xgfone/bt/metainfo"
 	"github.com/xgfone/bt/tracker/udptracker"
@@ -30,13 +30,13 @@ func UpdatePeers(route string) http.HandlerFunc {
 		torrent, err := cassandra.FindTorrentByInfohash(id)
 		if err != nil {
 			w.WriteHeader(404)
-			_, _ = fmt.Fprintf(w, "%s", pkg.JsonError(err))
+			_, _ = fmt.Fprintf(w, "%s", utils.JsonError(err))
 			return
 		}
 
 		go getResult(torrent)
 
-		_, _ = fmt.Fprintf(w, "%s", pkg.JsonMessage("processed"))
+		_, _ = fmt.Fprintf(w, "%s", utils.JsonMessage("processed"))
 		//_, _ = fmt.Fprintf(w, "%s: %s", route, infohash
 	}
 }

@@ -3,7 +3,7 @@ package tracker
 import (
 	"bytes"
 	"encoding/json"
-	"example.com/m/internal/pkg"
+	"example.com/m/internal/pkg/utils"
 	"github.com/xgfone/bt/metainfo"
 	"github.com/xgfone/bt/tracker/udptracker"
 	"net"
@@ -29,7 +29,7 @@ func (testHandler) OnAnnounce(raddr *net.UDPAddr, req udptracker.AnnounceRequest
 		Interval:  120, // 2 mins
 		Leechers:  uint32(int(RedisCount(req.InfoHash.String() + ":incomplete"))),
 		Seeders:   uint32(int(RedisCount(req.InfoHash.String() + ":complete"))),
-		Addresses: pkg.GetPeersFromTrackers(req.PeerID, req.InfoHash, OtherTrackers, RedisGet(req.InfoHash.String())),
+		Addresses: utils.GetPeersFromTrackers(req.PeerID, req.InfoHash, OtherTrackers, RedisGet(req.InfoHash.String())),
 	}
 	return
 }
