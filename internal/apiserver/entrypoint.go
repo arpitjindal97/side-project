@@ -1,6 +1,7 @@
 package apiserver
 
 import (
+	"context"
 	goprom "github.com/prometheus/client_golang/prometheus"
 	"github.com/xgfone/go-apiserver/entrypoint"
 	"github.com/xgfone/go-apiserver/http/router"
@@ -10,12 +11,21 @@ import (
 	"github.com/xgfone/go-opentelemetry/otelhttpx"
 	"github.com/xgfone/go-opentelemetry/promexporter"
 	"go.opentelemetry.io/contrib/instrumentation/runtime"
+	"go.opentelemetry.io/otel/metric/global"
+	"go.opentelemetry.io/otel/metric/instrument/asyncint64"
 	"time"
 )
+
+var activeReq asyncint64.UpDownCounter
+var activeCount int64
 
 // StartHTTPServer is a simple convenient function to start a http server.
 func StartHTTPServer(addr string) (err error) {
 
+	activeReq, _ = global.MeterProvider().
+		Meter("go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp").
+		AsyncInt64().UpDownCounter("http.server.active_requests")
+	activeReq.Observe(context.Background(), activeCount)
 	handler := getRouter()
 	ep, err := entrypoint.NewEntryPoint("apiserver", addr, handler)
 	if err == nil {
