@@ -3,9 +3,12 @@ kind: Service
 metadata:
   name: apiserver
   namespace: default
+  labels:
+    app: apiserver
 spec:
   ports:
     - port: 8080
+      name: http-web
       protocol: TCP
       targetPort: 8080
       nodePort: 30001

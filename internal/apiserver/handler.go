@@ -17,8 +17,6 @@ import (
 
 func PostTorrentById(route string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		activeCount++
-		defer decreaseActiveReqCount()
 		labeler, _ := otelhttp.LabelerFromContext(r.Context())
 		labeler.Add(semconv.HTTPRouteKey.String(route))
 		c := reqresp.GetContext(w, r)
@@ -57,8 +55,6 @@ func PostTorrentById(route string) http.HandlerFunc {
 
 func GetTorrentById(route string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		activeCount++
-		defer decreaseActiveReqCount()
 		labeler, _ := otelhttp.LabelerFromContext(r.Context())
 		labeler.Add(semconv.HTTPRouteKey.String(route))
 		c := reqresp.GetContext(w, r)
@@ -97,8 +93,6 @@ func GetTorrentById(route string) http.HandlerFunc {
 
 func SearchQuery(route string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		activeCount++
-		defer decreaseActiveReqCount()
 		labeler, _ := otelhttp.LabelerFromContext(r.Context())
 		labeler.Add(semconv.HTTPRouteKey.String(route))
 		c := reqresp.GetContext(w, r)
@@ -125,8 +119,4 @@ func SearchQuery(route string) http.HandlerFunc {
 		_, _ = w.Write(data)
 		labeler.Add(semconv.HTTPStatusCodeKey.Int(200))
 	}
-}
-
-func decreaseActiveReqCount() {
-	activeCount--
 }
