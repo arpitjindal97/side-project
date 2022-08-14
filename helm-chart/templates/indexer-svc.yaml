@@ -3,11 +3,14 @@ kind: Service
 metadata:
   name: indexer
   namespace: default
+  labels:
+    app: indexer
 spec:
   ports:
     - port: 8082
       protocol: TCP
       targetPort: 8082
+      name: http-web
   selector:
     app: indexer
   type: ClusterIP

@@ -23,6 +23,10 @@ redis:
   master:
     affinity:
       *affinityNotMaster
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
 
 cassandra:
   dbUser:
@@ -30,6 +34,11 @@ cassandra:
     password: vergon
   nodeSelector:
     kubernetes.io/hostname: arpit-server
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: ""
 
 provisionDataStore:
   elasticsearch: true
@@ -54,4 +63,8 @@ elasticsearch:
   security:
     enabled: false
     elasticPassword: password
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
 

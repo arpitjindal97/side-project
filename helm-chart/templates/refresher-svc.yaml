@@ -3,11 +3,14 @@ kind: Service
 metadata:
   name: refresher
   namespace: default
+  labels:
+    app: refresher
 spec:
   ports:
     - port: 8081
       protocol: TCP
       targetPort: 8081
+      name: http-web
   selector:
     app: refresher
   type: ClusterIP
