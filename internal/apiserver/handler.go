@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 func PostTorrentById(route string) http.HandlerFunc {
@@ -47,7 +48,7 @@ func PostTorrentById(route string) http.HandlerFunc {
 		}
 
 		w.WriteHeader(200)
-		go addTorrent(queue.InfoHash)
+		go addTorrent(strings.ToLower(queue.InfoHash))
 		_, _ = fmt.Fprintf(w, utils.JsonMessage("Successfully received submission"))
 		labeler.Add(semconv.HTTPStatusCodeKey.Int(200))
 	}
@@ -58,7 +59,7 @@ func GetTorrentById(route string) http.HandlerFunc {
 		labeler, _ := otelhttp.LabelerFromContext(r.Context())
 		labeler.Add(semconv.HTTPRouteKey.String(route))
 		c := reqresp.GetContext(w, r)
-		id := fmt.Sprintf("%s", c.Data["id"])
+		id := strings.ToLower(fmt.Sprintf("%s", c.Data["id"]))
 		defer func() {
 			if nil != any(recover()) {
 				w.WriteHeader(500)
