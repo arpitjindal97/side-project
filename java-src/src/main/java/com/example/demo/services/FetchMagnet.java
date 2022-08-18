@@ -106,6 +106,11 @@ public class FetchMagnet {
                 torrentInfo.addTracker("udp://tracker.opentrackr.org:1337/announce",0);
                 torrentInfo.addTracker("udp://tracker.openbittorrent.com:6969",1);
                 torrentInfo.addTracker("udp://tracker.coppersurfer.tk:6969/announce",2);
+                for(int x=0; x<torrentInfo.numFiles();x++) {
+                    System.out.println(torrentInfo.files().fileName(x));
+                    System.out.println(torrentInfo.files().fileSize(x));
+                    System.out.println(torrentInfo.files().filePath(x));
+                }
 
                 torrent.setInfohash(torrentInfo.infoHash().toString());
                 torrent.setCategory("Others");
