@@ -121,3 +121,30 @@ func SearchQuery(route string) http.HandlerFunc {
 		labeler.Add(semconv.HTTPStatusCodeKey.Int(200))
 	}
 }
+
+func GetFilesByInfohash(route string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		labeler, _ := otelhttp.LabelerFromContext(r.Context())
+		labeler.Add(semconv.HTTPRouteKey.String(route))
+		c := reqresp.GetContext(w, r)
+		defer func() {
+			if nil != any(recover()) {
+				w.WriteHeader(500)
+				labeler.Add(semconv.HTTPStatusCodeKey.Int(500))
+				_, _ = fmt.Fprintf(w, "%s", utils.JsonError(errors.New("internal server error")))
+			}
+		}()
+		id := strings.ToLower(fmt.Sprintf("%s", c.Data["id"]))
+		files, err := cassandra.FindFilesByInfohash(id)
+		if err != nil {
+			w.WriteHeader(404)
+			labeler.Add(semconv.HTTPStatusCodeKey.Int(404))
+			_, _ = fmt.Fprintf(w, "%s", utils.JsonError(err))
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		data, _ := json.MarshalIndent(files, "", "    ")
+		_, _ = w.Write(data)
+		labeler.Add(semconv.HTTPStatusCodeKey.Int(200))
+	}
+}

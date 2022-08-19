@@ -39,3 +39,9 @@ type Queue struct {
 	Date     time.Time `json:"date"`
 	Retry    int       `json:"retry"`
 }
+
+type Files struct {
+	Infohash string   `json:"infohash"`
+	FilePath []string `json:"filepath"`
+	Size     []int64  `json:"size"`
+}

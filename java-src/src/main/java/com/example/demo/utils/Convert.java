@@ -5,8 +5,6 @@ import com.example.demo.entities.FilesByInfohash;
 import com.example.demo.entities.TorrentByInfohash;
 import org.libtorrent4j.TorrentInfo;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 

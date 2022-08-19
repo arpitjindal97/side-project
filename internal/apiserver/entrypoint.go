@@ -39,6 +39,10 @@ func getRouter() *router.Router {
 		Path("/search").Method("GET").
 		Handler(otelhttpx.Handler(SearchQuery("/search"), ""))
 
+	routeManager.
+		Path("/files/{id}").Method("GET").
+		Handler(otelhttpx.Handler(GetFilesByInfohash("/files/{id}"), ""))
+
 	registry := goprom.DefaultRegisterer.(*goprom.Registry)
 	routeManager.Path("/metrics").Method("GET").
 		Handler(promexporter.Handler(registry))

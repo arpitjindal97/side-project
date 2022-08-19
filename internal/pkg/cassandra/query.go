@@ -19,6 +19,12 @@ const create_torrent_by_infohash = `CREATE TABLE IF NOT EXISTS torrent_by_infoha
     userid text,
 	PRIMARY KEY (infohash));`
 
+const create_files_by_infohash = `CREATE TABLE IF NOT EXISTS files_by_infohash (
+	infohash text,
+    filepath list<text>,
+    size list<bigint>,
+	PRIMARY KEY (infohash));`
+
 const create_queue_by_infohash = `CREATE TABLE IF NOT EXISTS queue_by_infohash (
 	infohash text,
 	date timestamp,
@@ -62,3 +68,5 @@ const insert_queue_by_infohash = `INSERT INTO queue_by_infohash (infohash, date,
 const find_queue_by_infohash = `SELECT * FROM queue_by_infohash where infohash = ?`
 
 const update_torrent_by_infohash = `UPDATE torrent_by_infohash set peers=?, seeders=?, leechers=? where infohash=?`
+
+const find_files_by_infohash = `SELECT * FROM files_by_infohash where infohash = ?`

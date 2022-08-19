@@ -34,6 +34,11 @@ func CreateTables() {
 		log.Fatal(err)
 	}
 
+	log.Println("Creating Table files_by_infohash")
+	if err = Session.Query(create_files_by_infohash).Exec(); err != nil {
+		log.Fatal(err)
+	}
+
 	log.Println("Creating Table queue_by_infohash")
 	if err = Session.Query(create_queue_by_infohash).Exec(); err != nil {
 		log.Fatal(err)

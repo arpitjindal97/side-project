@@ -46,3 +46,12 @@ func UpdateTorrentByInfohashPeers(torrent Torrent) error {
 		torrent.Leechers,
 		torrent.InfoHash).Exec()
 }
+
+func FindFilesByInfohash(id string) (files Files, err error) {
+	err = Session.Query(find_files_by_infohash, id).Consistency(gocql.One).Scan(
+		&files.Infohash,
+		&files.FilePath,
+		&files.Size,
+	)
+	return
+}
