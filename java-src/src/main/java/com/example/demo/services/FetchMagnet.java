@@ -1,11 +1,14 @@
 package com.example.demo.services;
 
+import com.example.demo.daos.FilesByInfohashRepository;
 import com.example.demo.daos.QueueByInfohashRepository;
 import com.example.demo.daos.TorrentByInfohashRepository;
 import com.example.demo.daos.TorrentIndexRepository;
 import com.example.demo.documents.Torrent;
+import com.example.demo.entities.FilesByInfohash;
 import com.example.demo.entities.QueueByInfohash;
 import com.example.demo.entities.TorrentByInfohash;
+import com.example.demo.utils.Convert;
 import org.libtorrent4j.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,17 +26,20 @@ public class FetchMagnet {
     SessionManager sessionManager;
     TorrentByInfohashRepository torrentByInfohashRepository;
     TorrentIndexRepository torrentIndexRepository;
+    FilesByInfohashRepository filesByInfohashRepository;
 
     Logger logger = LoggerFactory.getLogger(FetchMagnet.class);
 
     public FetchMagnet(QueueByInfohashRepository queueByInfohashRepository,
                        TorrentByInfohashRepository torrentByInfohashRepository,
                        TorrentIndexRepository torrentIndexRepository,
+                       FilesByInfohashRepository filesByInfohashRepository,
                        SessionManager s) {
         this.queueByInfohashRepository = queueByInfohashRepository;
         this.sessionManager = s;
         this.torrentByInfohashRepository = torrentByInfohashRepository;
         this.torrentIndexRepository = torrentIndexRepository;
+        this.filesByInfohashRepository = filesByInfohashRepository;
     }
 
     /*
@@ -64,8 +70,8 @@ public class FetchMagnet {
         //queue.setRetry(queue.getRetry()+1);
         queueByInfohashRepository.save(queue);
 
-        TorrentByInfohash torrent = fetchInfo(queue.getInfoHash());
-        if (torrent == null) {
+        TorrentInfo torrentInfo = fetchInfo(queue.getInfoHash());
+        if (torrentInfo == null) {
             queue.setRetry(queue.getRetry()+1);
             if (queue.getRetry() == 5) {
                 queueByInfohashRepository.delete(queue);
@@ -77,21 +83,21 @@ public class FetchMagnet {
         }
         logger.info("Successfully fetched "+queue.getInfoHash());
 
-        TorrentByInfohash duplicate = this.torrentByInfohashRepository.findByInfohashEquals(torrent.getInfohash());
+        TorrentByInfohash duplicate = this.torrentByInfohashRepository.findByInfohashEquals(torrentInfo.infoHash().toString());
 
         if (duplicate != null) {
             logger.error("Infohash "+queue.getInfoHash()+" already exists on database");
             queueByInfohashRepository.delete(queue);
         } else {
-            torrentByInfohashRepository.save(torrent);
+            torrentByInfohashRepository.save(Convert.getTorrentByInfohash(torrentInfo));
+            filesByInfohashRepository.save(Convert.getFilesByInfohash(torrentInfo));
             queueByInfohashRepository.delete(queue);
-            saveToElasticSearch(torrent);
+            torrentIndexRepository.save(Convert.getTorrentDocument(torrentInfo));
             logger.info("Saved into Database");
         }
     }
 
-
-    public TorrentByInfohash fetchInfo(String infohash) {
+    public TorrentInfo fetchInfo(String infohash) {
 
         String uri = "magnet:?xt=urn:btih:"+infohash+"&tr=udp%3a%2f%2ftracker.opentrackr.org%3a1337%2fannounce";
 
@@ -99,34 +105,8 @@ public class FetchMagnet {
         try {
             byte[] data = sessionManager.fetchMagnet(uri, 180, new File("/tmp"));
 
-            TorrentByInfohash torrent = new TorrentByInfohash();
-
             if (data != null) {
-                TorrentInfo torrentInfo = new TorrentInfo(data);
-                torrentInfo.addTracker("udp://tracker.opentrackr.org:1337/announce",0);
-                torrentInfo.addTracker("udp://tracker.openbittorrent.com:6969",1);
-                torrentInfo.addTracker("udp://tracker.coppersurfer.tk:6969/announce",2);
-                for(int x=0; x<torrentInfo.numFiles();x++) {
-                    System.out.println(torrentInfo.files().fileName(x));
-                    System.out.println(torrentInfo.files().fileSize(x));
-                    System.out.println(torrentInfo.files().filePath(x));
-                }
-
-                torrent.setInfohash(torrentInfo.infoHash().toString());
-                torrent.setCategory("Others");
-                torrent.setSubcategory("Others");
-                torrent.setName(torrentInfo.name());
-                torrent.setNumFiles(torrentInfo.numFiles());
-                torrent.setSize(torrentInfo.totalSize());
-                torrent.setComment(torrentInfo.comment());
-                torrent.setCreator(torrentInfo.creator());
-                torrent.setSeeders(0);
-                torrent.setLeechers(0);
-                torrent.setPeers(0);
-                torrent.setMagnet(torrentInfo.makeMagnetUri());
-                torrent.setUserid("Anonymous");
-                torrent.setDate(new Date());
-                return torrent;
+                return new TorrentInfo(data);
             }
         } catch(IllegalArgumentException e) {
             logger.error(e.getMessage() + infohash);
@@ -134,24 +114,4 @@ public class FetchMagnet {
         return null;
     }
 
-    public void saveToElasticSearch(TorrentByInfohash torrentByInfohash) {
-        Torrent document = new Torrent();
-
-        document.setInfohash(torrentByInfohash.getInfohash());
-        document.setCategory(torrentByInfohash.getCategory());
-        document.setSubcategory(torrentByInfohash.getSubcategory());
-        document.setComment(torrentByInfohash.getComment());
-        document.setCreator(torrentByInfohash.getCreator());
-        document.setDate(torrentByInfohash.getDate());
-        document.setLeechers(torrentByInfohash.getLeechers());
-        document.setMagnet(torrentByInfohash.getMagnet());
-        document.setName(torrentByInfohash.getName());
-        document.setNumFiles(torrentByInfohash.getNumFiles());
-        document.setPeers(torrentByInfohash.getPeers());
-        document.setSeeders(torrentByInfohash.getSeeders());
-        document.setSize(torrentByInfohash.getSize());
-        document.setUserid(torrentByInfohash.getUserid());
-
-        torrentIndexRepository.save(document);
-    }
 }
