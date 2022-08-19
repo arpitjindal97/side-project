@@ -56,9 +56,18 @@ func FindFilesByInfohash(id string) (files Files, err error) {
 }
 
 func DeleteTorrentById(id string) error {
-	err := Session.Query(delete_torrent_by_infohash, id).Consistency(gocql.One).Exec()
-	if err == nil {
-		return Session.Query(delete_files_by_infohash, id).Consistency(gocql.One).Exec()
+	batch := Session.NewBatch(gocql.UnloggedBatch)
+	batch.Entries = []gocql.BatchEntry{
+		{
+			Stmt:       delete_torrent_by_infohash,
+			Args:       []interface{}{id},
+			Idempotent: true,
+		},
+		{
+			Stmt:       delete_files_by_infohash,
+			Args:       []interface{}{id},
+			Idempotent: true,
+		},
 	}
-	return err
+	return Session.ExecuteBatch(batch)
 }

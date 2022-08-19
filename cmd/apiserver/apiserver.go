@@ -2,6 +2,7 @@ package main
 
 import (
 	"example.com/m/internal/apiserver"
+	_ "example.com/m/internal/apiserver/docs"
 	"example.com/m/internal/pkg/cassandra"
 	"example.com/m/internal/pkg/elasticsearch"
 	"github.com/go-redis/redis/v9"
@@ -9,7 +10,6 @@ import (
 )
 
 func main() {
-
 	// Redis Setup
 	log.Println("Initializing Redis")
 	apiserver.Rdb = redis.NewClient(&redis.Options{

@@ -1,0 +1,284 @@
+definitions:
+  Error:
+    properties:
+      error:
+        type: string
+        x-go-name: Error
+    type: object
+    x-go-package: example.com/m/internal/pkg/utils
+  Files:
+    properties:
+      filepath:
+        items:
+          type: string
+        type: array
+        x-go-name: FilePath
+      infohash:
+        type: string
+        x-go-name: Infohash
+      size:
+        items:
+          format: int64
+          type: integer
+        type: array
+        x-go-name: Size
+    type: object
+    x-go-package: example.com/m/internal/pkg/cassandra
+  Message:
+    properties:
+      message:
+        type: string
+        x-go-name: Message
+    type: object
+    x-go-package: example.com/m/internal/pkg/utils
+  SearchHit:
+    properties:
+      _index:
+        type: string
+        x-go-name: Index
+      _score:
+        format: double
+        type: number
+        x-go-name: Score
+      _source:
+        $ref: '#/definitions/Torrent'
+      _type:
+        type: string
+        x-go-name: Type
+      _version:
+        format: int64
+        type: integer
+        x-go-name: Version
+    type: object
+    x-go-package: example.com/m/internal/pkg/elasticsearch
+  SearchResponse:
+    properties:
+      hits:
+        properties:
+          hits:
+            items:
+              $ref: '#/definitions/SearchHit'
+            type: array
+            x-go-name: Hits
+          total:
+            properties:
+              value:
+                format: int64
+                type: integer
+                x-go-name: Value
+            type: object
+            x-go-name: Total
+        type: object
+        x-go-name: Hits
+      took:
+        format: int64
+        type: integer
+        x-go-name: Took
+    type: object
+    x-go-package: example.com/m/internal/pkg/elasticsearch
+  Torrent:
+    properties:
+      category:
+        format: int64
+        type: integer
+        x-go-name: Category
+      comment:
+        type: string
+        x-go-name: Comment
+      creator:
+        type: string
+        x-go-name: Creator
+      date:
+        format: date-time
+        type: string
+        x-go-name: Date
+      infohash:
+        type: string
+        x-go-name: InfoHash
+      leechers:
+        format: int64
+        type: integer
+        x-go-name: Leechers
+      magnet:
+        type: string
+        x-go-name: Magnet
+      name:
+        type: string
+        x-go-name: Name
+      num_files:
+        format: int64
+        type: integer
+        x-go-name: NumFiles
+      peers:
+        format: int64
+        type: integer
+        x-go-name: Peers
+      seeders:
+        format: int64
+        type: integer
+        x-go-name: Seeders
+      size:
+        format: int64
+        type: integer
+        x-go-name: Size
+      userid:
+        type: string
+        x-go-name: User
+    type: object
+    x-go-package: example.com/m/internal/pkg/cassandra
+info:
+  description: Documentation of apiserver API.
+  title: apiserver
+  version: 0.0.1
+paths:
+  /files/{id}:
+    get:
+      description: Get all the files present inside a torrent
+      operationId: GetFilesByInfohash
+      parameters:
+      - description: Pass the infohash id
+        in: path
+        name: id
+        required: true
+        type: string
+        x-go-name: ID
+      responses:
+        "200":
+          $ref: '#/responses/files'
+        default:
+          $ref: '#/responses/error'
+      tags:
+      - Torrent
+  /search:
+    get:
+      description: This powerful API provides all kinds of search functionalities
+        with Lucene Syntax
+      operationId: SearchQuery
+      parameters:
+      - description: |-
+          query parameter (lucene syntax) because backend is ElasticSearch
+          Ref:
+          https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax
+          https://www.lucenetutorial.com/lucene-query-syntax.html
+          https://lucene.apache.org/core/2_9_4/queryparsersyntax.html
+          ex: name:(Rise) AND seeders:(>1)
+        in: query
+        name: q
+        type: string
+        x-go-name: Query
+      - description: |-
+          Sort the results by one or more fields (lucene syntax)
+          Sorting to perform. Can either be in the form of fieldName, or fieldName:asc/fieldName:desc.
+          The fieldName has to be an actual field within the document
+          A comma-separated list of <field>:<direction> pairs
+          Ref: https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html
+          ex: peers:desc,date:asc
+        in: query
+        name: sort
+        type: string
+        x-go-name: Sort
+      - description: Number of items per page
+        format: int64
+        in: query
+        name: size
+        type: integer
+        x-go-name: Size
+      - description: |-
+          Tells from which item index result should appear (used together with size)
+          Index is the position of an element in result set (starting from zero)
+          It provides paging capabilities
+          >
+          Ex: size=2 & from=2
+          ==> gives 1st page with 2 elements
+          Ex: size=2 & from=2
+          ==> gives 2nd Page with 2 elements
+          Ex: size=2 & from=1
+          ==> gives a page which has two elements but 1st element was also present at the bottom of previous page
+        format: int64
+        in: query
+        name: from
+        type: integer
+        x-go-name: From
+      responses:
+        "200":
+          $ref: '#/responses/SearchQuery'
+      tags:
+      - Torrent
+  /torrents:
+    post:
+      description: Send a request to add torrent
+      operationId: PostTorrentById
+      parameters:
+      - description: infohash of torrent, one at a time
+        in: body
+        name: PostBody
+        schema:
+          properties:
+            infohash:
+              type: string
+              x-go-name: Infohash
+          type: object
+      responses:
+        "200":
+          $ref: '#/responses/message'
+        default:
+          $ref: '#/responses/error'
+      tags:
+      - Torrent
+  /torrents/{id}:
+    delete:
+      description: Deletes a torrent from Database
+      operationId: DeleteTorrentById
+      parameters:
+      - description: Pass the infohash id
+        in: path
+        name: id
+        required: true
+        type: string
+        x-go-name: ID
+      responses:
+        "200":
+          $ref: '#/responses/message'
+        default:
+          $ref: '#/responses/error'
+      tags:
+      - Torrent
+    get:
+      description: Get a particular torrent by passing infohash
+      operationId: GetTorrentById
+      parameters:
+      - description: Pass the infohash id
+        in: path
+        name: id
+        required: true
+        type: string
+        x-go-name: ID
+      responses:
+        "200":
+          $ref: '#/responses/torrent'
+        default:
+          $ref: '#/responses/error'
+      tags:
+      - Torrent
+responses:
+  SearchQuery:
+    description: ElasticSearch Result JSON
+    schema:
+      $ref: '#/definitions/SearchResponse'
+  error:
+    description: Generic response containing an error
+    schema:
+      $ref: '#/definitions/Error'
+  files:
+    description: JSON representation of all files present in a give torrent
+    schema:
+      $ref: '#/definitions/Files'
+  message:
+    description: Generic response containing a success message
+    schema:
+      $ref: '#/definitions/Message'
+  torrent:
+    description: JSON Body of a Torrent
+    schema:
+      $ref: '#/definitions/Torrent'
+swagger: "2.0"

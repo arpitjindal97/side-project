@@ -17,9 +17,9 @@ func Init(uris []string, username, password, keyspace string) {
 	}
 	cluster.Keyspace = keyspace
 	cluster.Consistency = gocql.Quorum
-	cluster.Timeout = time.Second * 3
-	cluster.WriteTimeout = time.Second * 3
-	cluster.ConnectTimeout = time.Second * 3
+	cluster.Timeout = time.Second * 10
+	cluster.WriteTimeout = time.Second * 10
+	cluster.ConnectTimeout = time.Second * 10
 	Session, _ = cluster.CreateSession()
 
 	CreateTables()

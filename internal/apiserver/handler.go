@@ -151,6 +151,14 @@ func GetFilesByInfohash(route string) http.HandlerFunc {
 }
 
 func DeleteTorrentById(route string) http.HandlerFunc {
+	/*
+		Deletes from
+		cassandra (table):
+			- files_by_infohash
+			- torrent_by_infohash
+		elasticsearch (index):
+			- torrents
+	*/
 	return func(w http.ResponseWriter, r *http.Request) {
 		labeler, _ := otelhttp.LabelerFromContext(r.Context())
 		labeler.Add(semconv.HTTPRouteKey.String(route))

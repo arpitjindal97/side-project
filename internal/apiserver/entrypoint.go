@@ -1,6 +1,8 @@
 package apiserver
 
 import (
+	_ "embed"
+	"github.com/go-openapi/runtime/middleware"
 	goprom "github.com/prometheus/client_golang/prometheus"
 	"github.com/xgfone/go-apiserver/entrypoint"
 	"github.com/xgfone/go-apiserver/http/router"
@@ -10,6 +12,7 @@ import (
 	"github.com/xgfone/go-opentelemetry/otelhttpx"
 	"github.com/xgfone/go-opentelemetry/promexporter"
 	"go.opentelemetry.io/contrib/instrumentation/runtime"
+	"net/http"
 	"time"
 )
 
@@ -23,6 +26,9 @@ func StartHTTPServer(addr string) (err error) {
 	}
 	return
 }
+
+//go:embed docs/swagger.yaml
+var swagger []byte
 
 func getRouter() *router.Router {
 	routeManager := ruler.NewRouter()
@@ -46,6 +52,15 @@ func getRouter() *router.Router {
 	routeManager.
 		Path("/files/{id}").Method("GET").
 		Handler(otelhttpx.Handler(GetFilesByInfohash("/files/{id}"), ""))
+
+	opts := middleware.SwaggerUIOpts{SpecURL: "/swagger.yaml"}
+	routeManager.Path("/docs").Method("GET").
+		Handler(middleware.SwaggerUI(opts, nil))
+
+	routeManager.Path("/swagger.yaml").Method("GET").
+		HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			_, _ = w.Write(swagger)
+		})
 
 	registry := goprom.DefaultRegisterer.(*goprom.Registry)
 	routeManager.Path("/metrics").Method("GET").
