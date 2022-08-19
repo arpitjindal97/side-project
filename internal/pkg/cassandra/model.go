@@ -5,20 +5,19 @@ import (
 )
 
 type Torrent struct {
-	InfoHash    string    `json:"infohash"`
-	Category    string    `json:"category"`
-	Comment     string    `json:"comment"`
-	Creator     string    `json:"creator"`
-	Date        time.Time `json:"date"`
-	Leechers    int       `json:"leechers"`
-	Magnet      string    `json:"magnet"`
-	Name        string    `json:"name"`
-	NumFiles    int       `json:"num_files"`
-	Peers       int       `json:"peers"`
-	Seeders     int       `json:"seeders"`
-	Size        int64     `json:"size"`
-	SubCategory string    `json:"subcategory"`
-	User        string    `json:"userid"`
+	InfoHash string    `json:"infohash"`
+	Category int       `json:"category"`
+	Comment  string    `json:"comment"`
+	Creator  string    `json:"creator"`
+	Date     time.Time `json:"date"`
+	Leechers int       `json:"leechers"`
+	Magnet   string    `json:"magnet"`
+	Name     string    `json:"name"`
+	NumFiles int       `json:"num_files"`
+	Peers    int       `json:"peers"`
+	Seeders  int       `json:"seeders"`
+	Size     int64     `json:"size"`
+	User     string    `json:"userid"`
 }
 
 type User struct {

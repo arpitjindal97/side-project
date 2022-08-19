@@ -18,8 +18,7 @@ public class Convert {
         torrentInfo.addTracker("udp://tracker.coppersurfer.tk:6969/announce",2);
 
         torrent.setInfohash(torrentInfo.infoHash().toString());
-        torrent.setCategory("Others");
-        torrent.setSubcategory("Others");
+        torrent.setCategory(600);
         torrent.setName(torrentInfo.name());
         torrent.setNumFiles(torrentInfo.numFiles());
         torrent.setSize(torrentInfo.totalSize());
@@ -54,7 +53,6 @@ public class Convert {
 
         document.setInfohash(torrentByInfohash.getInfohash());
         document.setCategory(torrentByInfohash.getCategory());
-        document.setSubcategory(torrentByInfohash.getSubcategory());
         document.setComment(torrentByInfohash.getComment());
         document.setCreator(torrentByInfohash.getCreator());
         document.setDate(torrentByInfohash.getDate());

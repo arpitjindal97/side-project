@@ -22,8 +22,7 @@ class ElasticRepositoryTest {
 	void crudOperationElastic() {
 		Torrent torrent = new Torrent();
 		torrent.setInfohash("abcd");
-		torrent.setCategory("Others");
-		torrent.setSubcategory("Others");
+		torrent.setCategory(601);
 		torrent.setName("Sample Name");
 		torrent.setNumFiles(15);
 		torrent.setSize(1024L);

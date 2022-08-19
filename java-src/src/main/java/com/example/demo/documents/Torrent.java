@@ -21,8 +21,8 @@ public class Torrent {
     @Id
     private String infohash;
 
-    @Field(type = FieldType.Keyword)
-    private String category;
+    @Field(type = FieldType.Integer)
+    private Integer category;
 
     @Field(type = FieldType.Text)
     private String comment;
@@ -53,9 +53,6 @@ public class Torrent {
 
     @Field(type = FieldType.Long)
     private Long size;
-
-    @Field(type = FieldType.Keyword)
-    private String subcategory;
 
     @Field(type = FieldType.Keyword)
     private String userid;

@@ -4,7 +4,7 @@ const create_keyspace = `create keyspace if not exists awesome with replication 
 
 const create_torrent_by_infohash = `CREATE TABLE IF NOT EXISTS torrent_by_infohash (
     infohash text,
-    category text,
+    category int,
 	comment text,
 	creator text,
     date timestamp,
@@ -15,7 +15,6 @@ const create_torrent_by_infohash = `CREATE TABLE IF NOT EXISTS torrent_by_infoha
     peers int,
     seeders int,
     size bigint,
-    subcategory text,
     userid text,
 	PRIMARY KEY (infohash));`
 

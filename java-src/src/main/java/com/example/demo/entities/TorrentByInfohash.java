@@ -18,7 +18,7 @@ public class TorrentByInfohash {
     @PrimaryKey
     String infohash;
 
-    String category;
+    Integer category;
     String comment;
     String creator;
     Date date;
@@ -32,7 +32,6 @@ public class TorrentByInfohash {
     Integer peers;
     Integer seeders;
     Long size;
-    String subcategory;
     String userid;
 
 }

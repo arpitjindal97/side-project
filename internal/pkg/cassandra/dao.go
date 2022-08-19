@@ -20,7 +20,6 @@ func FindTorrentByInfohash(id string) (Torrent, error) {
 		&torrent.Peers,
 		&torrent.Seeders,
 		&torrent.Size,
-		&torrent.SubCategory,
 		&torrent.User,
 	)
 	return torrent, err
