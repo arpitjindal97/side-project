@@ -32,6 +32,10 @@ func getRouter() *router.Router {
 		Handler(otelhttpx.Handler(GetTorrentById("/torrents/{id}"), ""))
 
 	routeManager.
+		Path("/torrents/{id}").Method("DELETE").
+		Handler(otelhttpx.Handler(DeleteTorrentById("/torrents/{id}"), ""))
+
+	routeManager.
 		Path("/torrents").Method("POST").
 		Handler(otelhttpx.Handler(PostTorrentById("/torrents"), ""))
 

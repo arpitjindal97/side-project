@@ -140,11 +140,35 @@ func GetFilesByInfohash(route string) http.HandlerFunc {
 			w.WriteHeader(404)
 			labeler.Add(semconv.HTTPStatusCodeKey.Int(404))
 			_, _ = fmt.Fprintf(w, "%s", utils.JsonError(err))
+			return
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 		data, _ := json.MarshalIndent(files, "", "    ")
 		_, _ = w.Write(data)
+		labeler.Add(semconv.HTTPStatusCodeKey.Int(200))
+	}
+}
+
+func DeleteTorrentById(route string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		labeler, _ := otelhttp.LabelerFromContext(r.Context())
+		labeler.Add(semconv.HTTPRouteKey.String(route))
+		c := reqresp.GetContext(w, r)
+		defer func() {
+			if nil != any(recover()) {
+				w.WriteHeader(500)
+				labeler.Add(semconv.HTTPStatusCodeKey.Int(500))
+				_, _ = fmt.Fprintf(w, "%s", utils.JsonError(errors.New("internal server error")))
+			}
+		}()
+		id := strings.ToLower(fmt.Sprintf("%s", c.Data["id"]))
+		_ = cassandra.DeleteTorrentById(id)
+		_ = elasticsearch.Delete(id)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		_, _ = fmt.Fprintf(w, "%s", utils.JsonMessage("Successfully deleted "+id))
 		labeler.Add(semconv.HTTPStatusCodeKey.Int(200))
 	}
 }

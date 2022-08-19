@@ -70,3 +70,7 @@ const find_queue_by_infohash = `SELECT * FROM queue_by_infohash where infohash =
 const update_torrent_by_infohash = `UPDATE torrent_by_infohash set peers=?, seeders=?, leechers=? where infohash=?`
 
 const find_files_by_infohash = `SELECT * FROM files_by_infohash where infohash = ?`
+
+const delete_files_by_infohash = `DELETE from files_by_infohash where infohash = ?`
+
+const delete_torrent_by_infohash = `DELETE from torrent_by_infohash where infohash = ?`

@@ -42,3 +42,12 @@ func Update(torrent cassandra.Torrent) {
 	}
 	defer res.Body.Close()
 }
+
+func Delete(id string) error {
+	req := esapi.DeleteRequest{
+		Index:      index,
+		DocumentID: id,
+	}
+	_, err := req.Do(context.Background(), es)
+	return err
+}

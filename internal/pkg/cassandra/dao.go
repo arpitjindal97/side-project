@@ -55,3 +55,11 @@ func FindFilesByInfohash(id string) (files Files, err error) {
 	)
 	return
 }
+
+func DeleteTorrentById(id string) error {
+	err := Session.Query(delete_torrent_by_infohash, id).Consistency(gocql.One).Exec()
+	if err == nil {
+		return Session.Query(delete_files_by_infohash, id).Consistency(gocql.One).Exec()
+	}
+	return err
+}
