@@ -1,7 +1,5 @@
 
 global:
-  redis:
-    password: bhXvm2p7Xj
   kibanaEnabled: false
 
 vergon:
@@ -15,33 +13,21 @@ vergon:
             values:
             - arpit-server
 
-redis:
-  replica:
-    replicaCount: 1
-    affinity:
-      *affinityNotMaster
-  master:
-    affinity:
-      *affinityNotMaster
-  metrics:
-    enabled: true
-    serviceMonitor:
-      enabled: true
-
 cassandra:
-  topologySpreadConstraints:
-    - topologyKey: "topology.kubernetes.io/region"
-      whenUnsatisfiable: "DoNotSchedule"
-      maxSkew: 1
-  replicaCount: 1
   cluster:
-    datacenter: datacenter1
+    datacenter: nand1
     endpointSnitch: GossipingPropertyFileSnitch
     extraSeeds:
-      - nand-cassandra-0.nand-cassandra-headless.nand
+      - vergon-cassandra-0.vergon-cassandra-headless.default
   dbUser:
     user: cassandra
     password: vergon
+  nodeSelector:
+    topology.kubernetes.io/region: nand
+  tolerations:
+    - key: "node-role.kubernetes.io/master"
+      operator: "Exists"
+      effect: "NoSchedule"
   metrics:
     enabled: true
     serviceMonitor:
@@ -49,7 +35,8 @@ cassandra:
       namespace: ""
 
 provisionDataStore:
-  elasticsearch: true
+  elasticsearch: false
+  cassandra: true
 
 elasticsearch:
   image:

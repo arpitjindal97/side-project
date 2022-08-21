@@ -1,6 +1,7 @@
 package cassandra
 
-const create_keyspace = `create keyspace if not exists awesome with replication = {'class':'SimpleStrategy', 'replication_factor':1};`
+const create_keyspace = `create keyspace if not exists awesome with replication = 
+	{'class' : 'NetworkTopologyStrategy', 'datacenter1' : 2, 'nand1' : 1 };`
 
 const create_torrent_by_infohash = `CREATE TABLE IF NOT EXISTS torrent_by_infohash (
     infohash text,
