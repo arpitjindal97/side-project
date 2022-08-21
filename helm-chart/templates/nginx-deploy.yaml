@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+spec:
+  selector:
+    matchLabels:
+      app: gateway
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+      labels:
+        app: gateway
+    spec:
+      affinity:
+        {{- .Values.vergon.affinityNotMaster | toYaml | nindent 8 }}
+      containers:
+        - name: apiserver
+          image: nginx:latest
+          ports:
+            - containerPort: 80
