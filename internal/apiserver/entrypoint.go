@@ -44,7 +44,6 @@ var redirectURI = "/auth/callback"
 
 func getRouter() *router.Router {
 	routeManager := ruler.NewRouter()
-	routeManager.AddProfileRoutes("/api")
 
 	routeManager.
 		Path("/torrents/{id}").Method("GET").
