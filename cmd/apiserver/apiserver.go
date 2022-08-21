@@ -2,7 +2,6 @@ package main
 
 import (
 	"example.com/m/internal/apiserver"
-	_ "example.com/m/internal/apiserver/docs"
 	"example.com/m/internal/pkg/cassandra"
 	"example.com/m/internal/pkg/elasticsearch"
 	"github.com/go-redis/redis/v9"

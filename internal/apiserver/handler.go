@@ -180,3 +180,9 @@ func DeleteTorrentById(route string) http.HandlerFunc {
 		labeler.Add(semconv.HTTPStatusCodeKey.Int(200))
 	}
 }
+
+func SecureResource(route string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+	}
+}

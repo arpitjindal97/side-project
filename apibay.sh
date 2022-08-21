@@ -1,5 +1,8 @@
 
 data=$(curl --silent 'https://apibay.org/precompiled/data_top100_200.json' | jq '.[].info_hash')
+data=$(curl --silent 'https://apibay.org/q.php?q=category%3A400' | jq '.[].info_hash')
+data=$(curl --silent 'https://apibay.org/q.php?q=category%3A200' | jq '.[].info_hash')
+data=$(curl --silent 'https://apibay.org/precompiled/data_top100_300.json' | jq '.[].info_hash')
 
 for info in $data
 do

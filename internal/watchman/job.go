@@ -1,71 +1,125 @@
 package watchman
 
 import (
-	"example.com/m/internal/apiserver"
-	"example.com/m/internal/pkg/cassandra"
+	"context"
+	"crypto/sha256"
 	"fmt"
-	"sync"
+	"log"
+	"net/http"
+	"os"
+
+	"github.com/gorilla/mux"
+	"golang.org/x/text/language"
+
+	"github.com/zitadel/oidc/pkg/op"
 )
 
-var JobStartTime string
+const (
+	pathLoggedOut = "/logged-out"
+)
 
-func StartJob() {
-	iteration := 0
-	for apiserver.RedisCount(JobStartTime) > 0 {
-		iteration++
-		fmt.Printf("Iteration : %d\n", iteration)
-		var wg sync.WaitGroup
-
-		wg.Add(0)
-		go thread(&wg, 0, 100, 0)
-
-		wg.Add(1)
-		go thread(&wg, 100, 100, 1)
-
-		wg.Add(2)
-		go thread(&wg, 200, 100, 2)
-
-		// waiting for all threads to get complete
-		wg.Wait()
-	}
-	fmt.Println("Job Completed")
+func init() {
+	RegisterClients(
+		NativeClient("native"),
+		WebClient("web", "secret", "http://localhost:8080/auth/callback"),
+		WebClient("api", "secret"),
+	)
 }
 
-func thread(wg *sync.WaitGroup, offset, count int64, threadId int) {
-	defer wg.Done()
-	infohashes := apiserver.RedisGet(JobStartTime, offset, count)
-	//var torrent cassandra.Torrent
-	//var queue cassandra.Queue
-	var err error
-	for _, infohash := range infohashes {
+func StartJob() {
+	ctx := context.Background()
 
-		// select * from cassandra.indexed table where infohash = infohash
-		// if this is already present in cassandra
-		// update ttl of this entry in cassandra
-		// else
-		// insert into cassandra.queue NX
+	//this will allow us to use an issuer with http:// instead of https://
+	os.Setenv(op.OidcDevMode, "true")
 
-		_, err = cassandra.FindTorrentByInfohash(infohash)
+	port := "9998"
 
-		if err == nil {
-			// it was already indexed and present in cassandra
-			// send to peer_updater
+	//the OpenID Provider requires a 32-byte key for (token) encryption
+	//be sure to create a proper crypto random key and manage it securely!
+	key := sha256.Sum256([]byte("test"))
 
-		} else {
-			// it is new torrent, needs to be queued
-			// check if it's already present in queue
-			_, err = cassandra.FindQueueByInfohash(infohash)
-			if err != nil {
-				// not present in queue
-				fmt.Println("Inserting into queue: " + infohash)
-				_ = cassandra.InsertQueueByInfohash(infohash)
-			}
+	router := mux.NewRouter()
+
+	//for simplicity, we provide a very small default page for users who have signed out
+	router.HandleFunc(pathLoggedOut, func(w http.ResponseWriter, req *http.Request) {
+		_, err := w.Write([]byte("signed out successfully"))
+		if err != nil {
+			log.Printf("error serving logged out page: %v", err)
 		}
+	})
 
-		//time.Sleep(time.Second * 1)
-		fmt.Printf("Thread %d evaluated %s\n", threadId, infohash)
+	//the OpenIDProvider interface needs a Storage interface handling various checks and state manipulations
+	//this might be the layer for accessing your database
+	//in this example it will be handled in-memory
+	storage := NewStorage()
 
-		// finally
-		apiserver.RedisRemove(infohash)
+	//creation of the OpenIDProvider with the just created in-memory Storage
+	provider, err := newOP(ctx, storage, port, key)
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	//the provider will only take care of the OpenID Protocol, so there must be some sort of UI for the login process
+	//for the simplicity of the example this means a simple page with username and password field
+	l := NewLogin(storage, op.AuthCallbackURL(provider))
+
+	//regardless of how many pages / steps there are in the process, the UI must be registered in the router,
+	//so we will direct all calls to /login to the login UI
+	router.PathPrefix("/login/").Handler(http.StripPrefix("/login", l.router))
+
+	//we register the http handler of the OP on the root, so that the discovery endpoint (/.well-known/openid-configuration)
+	//is served on the correct path
+	//
+	//if your issuer ends with a path (e.g. http://localhost:9998/custom/path/),
+	//then you would have to set the path prefix (/custom/path/)
+	router.PathPrefix("/").Handler(provider.HttpHandler())
+
+	server := &http.Server{
+		Addr:    ":" + port,
+		Handler: router,
+	}
+	err = server.ListenAndServe()
+	if err != nil {
+		log.Fatal(err)
+	}
+	<-ctx.Done()
+}
+
+//newOP will create an OpenID Provider for localhost on a specified port with a given encryption key
+//and a predefined default logout uri
+//it will enable all options (see descriptions)
+func newOP(ctx context.Context, storage op.Storage, port string, key [32]byte) (op.OpenIDProvider, error) {
+	config := &op.Config{
+		Issuer:    fmt.Sprintf("http://localhost:%s/", port),
+		CryptoKey: key,
+
+		//will be used if the end_session endpoint is called without a post_logout_redirect_uri
+		DefaultLogoutRedirectURI: pathLoggedOut,
+
+		//enables code_challenge_method S256 for PKCE (and therefore PKCE in general)
+		CodeMethodS256: true,
+
+		//enables additional client_id/client_secret authentication by form post (not only HTTP Basic Auth)
+		AuthMethodPost: true,
+
+		//enables additional authentication by using private_key_jwt
+		AuthMethodPrivateKeyJWT: true,
+
+		//enables refresh_token grant use
+		GrantTypeRefreshToken: true,
+
+		//enables use of the `request` Object parameter
+		RequestObjectSupported: true,
+
+		//this example has only static texts (in English), so we'll set the here accordingly
+		SupportedUILocales: []language.Tag{language.English},
+	}
+	handler, err := op.NewOpenIDProvider(ctx, config, storage,
+		//as an example on how to customize an endpoint this will change the authorization_endpoint from /authorize to /auth
+		op.WithCustomAuthEndpoint(op.NewEndpoint("auth")),
+	)
+	if err != nil {
+		return nil, err
+	}
+	return handler, nil
 }
