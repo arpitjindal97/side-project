@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oidc
+spec:
+  selector:
+    matchLabels:
+      app: oidc
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+      labels:
+        app: oidc
+    spec:
+      affinity:
+        {{- .Values.vergon.affinityNotMaster | toYaml | nindent 8 }}
+      containers:
+        - name: oidc
+          image: arpitjindal1997/oidc:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9998

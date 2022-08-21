@@ -1,4 +1,4 @@
-package watchman
+package oidc
 
 import (
 	"crypto/rsa"

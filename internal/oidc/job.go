@@ -1,4 +1,4 @@
-package watchman
+package oidc
 
 import (
 	"context"
@@ -72,7 +72,7 @@ func StartJob() {
 	//
 	//if your issuer ends with a path (e.g. http://localhost:9998/custom/path/),
 	//then you would have to set the path prefix (/custom/path/)
-	router.PathPrefix("/").Handler(provider.HttpHandler())
+	router.PathPrefix("/oidc/").Handler(provider.HttpHandler())
 
 	server := &http.Server{
 		Addr:    ":" + port,
