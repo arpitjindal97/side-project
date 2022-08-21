@@ -65,7 +65,7 @@ func getRouter() *router.Router {
 		Path("/files/{id}").Method("GET").
 		Handler(otelhttpx.Handler(GetFilesByInfohash("/files/{id}"), ""))
 
-	opts := middleware.SwaggerUIOpts{SpecURL: "/swagger.yaml"}
+	opts := middleware.SwaggerUIOpts{SpecURL: "/api/swagger.yaml"}
 	routeManager.Path("/docs").Method("GET").
 		Handler(middleware.SwaggerUI(opts, nil))
 

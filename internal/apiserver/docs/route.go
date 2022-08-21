@@ -3,19 +3,19 @@ package docs
 // internal/utils/swagger.go is imported automatically which contains
 // all the responses
 
-// swagger:route GET /api/torrents/{id} Torrent GetTorrentById
+// swagger:route GET /torrents/{id} Torrent GetTorrentById
 // Get a particular torrent by passing infohash
 // responses:
 //	200: torrent
 //	default: error
 
-// swagger:route DELETE /api/torrents/{id} Torrent DeleteTorrentById
+// swagger:route DELETE /torrents/{id} Torrent DeleteTorrentById
 // Deletes a torrent from Database
 // responses:
 //	200: message
 //	default: error
 
-// swagger:route GET /api/files/{id} Torrent GetFilesByInfohash
+// swagger:route GET /files/{id} Torrent GetFilesByInfohash
 // Get all the files present inside a torrent
 // responses:
 //	200: files
@@ -28,7 +28,7 @@ type infohashParam struct {
 	ID string `json:"id"`
 }
 
-// swagger:route POST /api/torrents Torrent PostTorrentById
+// swagger:route POST /torrents Torrent PostTorrentById
 // Send a request to add torrent
 // responses:
 //	200: message

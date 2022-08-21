@@ -1,3 +1,4 @@
+basePath: /api
 definitions:
   Error:
     properties:
@@ -131,7 +132,7 @@ info:
   title: apiserver
   version: 0.0.1
 paths:
-  /api/files/{id}:
+  /files/{id}:
     get:
       description: Get all the files present inside a torrent
       operationId: GetFilesByInfohash
@@ -145,62 +146,6 @@ paths:
       responses:
         "200":
           $ref: '#/responses/files'
-        default:
-          $ref: '#/responses/error'
-      tags:
-      - Torrent
-  /api/torrents:
-    post:
-      description: Send a request to add torrent
-      operationId: PostTorrentById
-      parameters:
-      - description: infohash of torrent, one at a time
-        in: body
-        name: PostBody
-        schema:
-          properties:
-            infohash:
-              type: string
-              x-go-name: Infohash
-          type: object
-      responses:
-        "200":
-          $ref: '#/responses/message'
-        default:
-          $ref: '#/responses/error'
-      tags:
-      - Torrent
-  /api/torrents/{id}:
-    delete:
-      description: Deletes a torrent from Database
-      operationId: DeleteTorrentById
-      parameters:
-      - description: Pass the infohash id
-        in: path
-        name: id
-        required: true
-        type: string
-        x-go-name: ID
-      responses:
-        "200":
-          $ref: '#/responses/message'
-        default:
-          $ref: '#/responses/error'
-      tags:
-      - Torrent
-    get:
-      description: Get a particular torrent by passing infohash
-      operationId: GetTorrentById
-      parameters:
-      - description: Pass the infohash id
-        in: path
-        name: id
-        required: true
-        type: string
-        x-go-name: ID
-      responses:
-        "200":
-          $ref: '#/responses/torrent'
         default:
           $ref: '#/responses/error'
       tags:
@@ -258,6 +203,62 @@ paths:
       responses:
         "200":
           $ref: '#/responses/SearchQuery'
+      tags:
+      - Torrent
+  /torrents:
+    post:
+      description: Send a request to add torrent
+      operationId: PostTorrentById
+      parameters:
+      - description: infohash of torrent, one at a time
+        in: body
+        name: PostBody
+        schema:
+          properties:
+            infohash:
+              type: string
+              x-go-name: Infohash
+          type: object
+      responses:
+        "200":
+          $ref: '#/responses/message'
+        default:
+          $ref: '#/responses/error'
+      tags:
+      - Torrent
+  /torrents/{id}:
+    delete:
+      description: Deletes a torrent from Database
+      operationId: DeleteTorrentById
+      parameters:
+      - description: Pass the infohash id
+        in: path
+        name: id
+        required: true
+        type: string
+        x-go-name: ID
+      responses:
+        "200":
+          $ref: '#/responses/message'
+        default:
+          $ref: '#/responses/error'
+      tags:
+      - Torrent
+    get:
+      description: Get a particular torrent by passing infohash
+      operationId: GetTorrentById
+      parameters:
+      - description: Pass the infohash id
+        in: path
+        name: id
+        required: true
+        type: string
+        x-go-name: ID
+      responses:
+        "200":
+          $ref: '#/responses/torrent'
+        default:
+          $ref: '#/responses/error'
       tags:
       - Torrent
 responses:
