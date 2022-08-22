@@ -1,0 +1,42 @@
+kube-prometheus-stack:
+  alertmanager:
+    enabled: false
+  nodeExporter:
+    enabled: false
+
+  affinityNotMaster: &affinityNotMaster
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                  - arpit-server
+
+  prometheus:
+    service:
+      type: NodePort
+    #affinity:
+    #  *affinityNotMaster
+    prometheusSpec:
+      scrape_interval: 10s
+      serviceMonitorSelectorNilUsesHelmValues: false
+      serviceMonitorNamespaceSelector:
+        matchExpressions:
+          - key: kubernetes.io/metadata.name
+            operator: Exists
+            values:
+
+  prometheusOperator:
+    #affinity:
+    #  *affinityNotMaster
+
+  grafana:
+    service:
+      type: NodePort
+      nodePort: 30030
+    #affinity:
+    #  *affinityNotMaster
+    #plugins:
+    #  - redis-datasource
