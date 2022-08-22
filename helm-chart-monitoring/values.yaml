@@ -36,6 +36,10 @@ kube-prometheus-stack:
     service:
       type: NodePort
       nodePort: 30030
+    sidecar:
+      dashboards:
+        provider:
+          foldersFromFilesStructure: true
     #affinity:
     #  *affinityNotMaster
     #plugins:
