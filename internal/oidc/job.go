@@ -72,7 +72,8 @@ func StartJob() {
 	//
 	//if your issuer ends with a path (e.g. http://localhost:9998/custom/path/),
 	//then you would have to set the path prefix (/custom/path/)
-	router.PathPrefix("/oidc/").Handler(provider.HttpHandler())
+	//router.PathPrefix("/").Handler(provider.HttpHandler())
+	router.PathPrefix("/oidc/").Handler(http.StripPrefix("/oidc", provider.HttpHandler()))
 
 	server := &http.Server{
 		Addr:    ":" + port,
@@ -90,7 +91,7 @@ func StartJob() {
 //it will enable all options (see descriptions)
 func newOP(ctx context.Context, storage op.Storage, port string, key [32]byte) (op.OpenIDProvider, error) {
 	config := &op.Config{
-		Issuer:    fmt.Sprintf("http://localhost:%s/", port),
+		Issuer:    fmt.Sprintf("http://188.166.76.22:30001/oidc/"),
 		CryptoKey: key,
 
 		//will be used if the end_session endpoint is called without a post_logout_redirect_uri
