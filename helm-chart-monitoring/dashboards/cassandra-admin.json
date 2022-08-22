@@ -21,12 +21,11 @@
       }
     ]
   },
-  "description": "Monitoring for Cassandra clusters",
+  "description": "Monitoring for Infra Engineer",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "gnetId": 10849,
   "graphTooltip": 1,
-  "id": 28,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -4585,12 +4584,14 @@
   "refresh": "1m",
   "schemaVersion": 36,
   "style": "dark",
-  "tags": [],
+  "tags": [
+    "cassandra"
+  ],
   "templating": {
     "list": [
       {
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "cassandra",
           "value": "cassandra"
         },
@@ -4620,7 +4621,7 @@
       {
         "allValue": ".+",
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "All",
           "value": "$__all"
         },
@@ -4650,7 +4651,7 @@
     ]
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-3h",
     "to": "now"
   },
   "timepicker": {
@@ -4679,8 +4680,8 @@
     ]
   },
   "timezone": "",
-  "title": "cassandra-dashboard",
+  "title": "Cassandra Admin",
   "uid": "PbhrxMuiz",
-  "version": 4,
+  "version": 1,
   "weekStart": ""
 }
