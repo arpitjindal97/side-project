@@ -21,7 +21,7 @@ func main() {
 	tracker.Rdb = redis.NewClient(&redis.Options{
 		Addr:     "vergon-redis-master:6379",
 		Password: "bhXvm2p7Xj", // no password set
-		DB:       0,            // use default DB
+		DB:       1,            // use default DB
 	})
 	defer tracker.Rdb.Close()
 

@@ -14,15 +14,20 @@ vergon:
             operator: NotIn
             values:
             - arpit-server
+  topologySpeadConstraints: &topologyRegion
+    - topologyKey: "topology.kubernetes.io/region"
+      whenUnsatisfiable: "DoNotSchedule"
+      maxSkew: 1
 
 redis:
-  replica:
-    replicaCount: 1
-    affinity:
-      *affinityNotMaster
+  architecture: standalone
   master:
-    affinity:
-      *affinityNotMaster
+    kind: Deployment
+    persistence:
+      enabled: false
+    count: 1  #default
+    #affinity:
+    #  *affinityNotMaster
   metrics:
     enabled: true
     serviceMonitor:
@@ -30,9 +35,7 @@ redis:
 
 cassandra:
   topologySpreadConstraints:
-    - topologyKey: "topology.kubernetes.io/region"
-      whenUnsatisfiable: "DoNotSchedule"
-      maxSkew: 1
+    *topologyRegion
   replicaCount: 1
   cluster:
     datacenter: datacenter1
@@ -54,16 +57,21 @@ provisionDataStore:
 elasticsearch:
   image:
     tag: 7.17.5
+  extraConfig:
+    node.attr.dc: datacenter1
+    cluster.routing.allocation.awareness.attributes: dc
   master:
-    masterOnly: false
+    topologySpreadConstraints:
+      *topologyRegion
     replicaCount: 1
     autoscaling:
+      enabled: false
       minReplicas: 1
       maxReplicas: 2
-    affinity:
-      *affinityNotMaster
   data:
-    replicaCount: 0
+    replicaCount: 1
+    topologySpreadConstraints:
+      *topologyRegion
   ingest:
     replicaCount: 0
   coordinating:
