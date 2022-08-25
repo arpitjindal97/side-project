@@ -34,7 +34,7 @@ func Update(torrent cassandra.Torrent) {
 	request := esapi.UpdateRequest{
 		Index:      index,
 		DocumentID: torrent.InfoHash,
-		Body:       bytes.NewReader([]byte(fmt.Sprintf(`{"doc":%s}`, body))),
+		Body:       bytes.NewReader([]byte(fmt.Sprintf(`{"doc":%s,"doc_as_upsert": true}`, body))),
 	}
 	res, err := request.Do(context.Background(), es)
 	if err != nil {
