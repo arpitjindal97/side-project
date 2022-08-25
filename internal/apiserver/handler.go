@@ -46,10 +46,11 @@ func PostTorrentById(route string) http.HandlerFunc {
 			_, _ = fmt.Fprintf(w, "%s", utils.JsonError(errors.New("bad request json")))
 			return
 		}
+		queue.InfoHash = strings.ToLower(queue.InfoHash)
 
 		w.WriteHeader(200)
-		go addTorrent(strings.ToLower(queue.InfoHash))
-		_, _ = fmt.Fprintf(w, utils.JsonMessage("Successfully received submission"))
+		go addTorrent(queue.InfoHash)
+		_, _ = fmt.Fprintf(w, utils.JsonMessage("successfully received submission for "+queue.InfoHash))
 		labeler.Add(semconv.HTTPStatusCodeKey.Int(200))
 	}
 }
