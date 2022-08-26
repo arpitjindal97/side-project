@@ -53,5 +53,6 @@ func addTorrent(infohash string) {
 		"infohash": infohash,
 	})
 
-	_, _ = http.Post(APIServerURL+"/torrents", "application/json", bytes.NewBuffer(reqBody))
+	resp, _ := http.Post(APIServerURL+"/torrents", "application/json", bytes.NewBuffer(reqBody))
+	_ = resp.Body.Close()
 }
