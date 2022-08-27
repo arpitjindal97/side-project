@@ -14,8 +14,10 @@ spec:
       labels:
         app: gateway
     spec:
+      {{- /*
       affinity:
         {{- .Values.vergon.affinityNotMaster | toYaml | nindent 8 }}
+      */}}
       containers:
         - name: apiserver
           image: nginx:latest
@@ -24,6 +26,13 @@ spec:
           volumeMounts:
             - name: nginx-config
               mountPath: /etc/nginx/
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "10m"
+            limits:
+              memory: "64Mi"
+              cpu: "50m"
       volumes:
         - name: nginx-config
           configMap:

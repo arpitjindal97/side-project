@@ -14,11 +14,20 @@ spec:
       labels:
         app: apiserver
     spec:
+      {{- /*
       affinity:
         {{- .Values.vergon.affinityNotMaster | toYaml | nindent 8 }}
+      */}}
       containers:
         - name: apiserver
           image: arpitjindal1997/apiserver:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "10m"
+            limits:
+              memory: "64Mi"
+              cpu: "50m"

@@ -14,11 +14,20 @@ spec:
       labels:
         app: oidc
     spec:
+      {{- /*
       affinity:
         {{- .Values.vergon.affinityNotMaster | toYaml | nindent 8 }}
+      */}}
       containers:
         - name: oidc
           image: arpitjindal1997/oidc:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 9998
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "10m"
+            limits:
+              memory: "64Mi"
+              cpu: "50m"

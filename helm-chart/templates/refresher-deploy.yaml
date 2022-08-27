@@ -14,11 +14,20 @@ spec:
       labels:
         app: refresher
     spec:
+      {{- /*
       affinity:
         {{- .Values.vergon.affinityNotMaster | toYaml | nindent 8 }}
+      */}}
       containers:
         - name: refresher
           image: arpitjindal1997/refresher:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8081
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "10m"
+            limits:
+              memory: "64Mi"
+              cpu: "50m"

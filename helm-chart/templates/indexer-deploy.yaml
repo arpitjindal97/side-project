@@ -14,11 +14,21 @@ spec:
       labels:
         app: indexer
     spec:
+      {{- /*
       affinity:
         {{- .Values.vergon.affinityNotMaster | toYaml | nindent 8 }}
+      */}}
       containers:
         - name: indexer
           image: arpitjindal1997/indexer:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8082
+          resources:
+            requests:
+              memory: "896Mi"
+              cpu: "10m"
+            limits:
+              memory: "1024Mi"
+              cpu: "50m"
+

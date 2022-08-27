@@ -12,11 +12,20 @@ spec:
       labels:
         app: tracker
     spec:
+      {{- /*
       affinity:
         {{- .Values.vergon.affinityNotMaster | toYaml | nindent 8 }}
+      */}}
       containers:
         - name: tracker
           image: arpitjindal1997/tracker:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 1337
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "10m"
+            limits:
+              memory: "64Mi"
+              cpu: "50m"
