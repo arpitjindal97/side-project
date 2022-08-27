@@ -22,14 +22,6 @@ func PostTorrentById(route string) http.HandlerFunc {
 		labeler.Add(semconv.HTTPRouteKey.String(route))
 		c := reqresp.GetContext(w, r)
 		w.Header().Set("Content-Type", "application/json")
-		body, err := ioutil.ReadAll(c.Body)
-		if err != nil {
-			w.WriteHeader(502)
-			labeler.Add(semconv.HTTPStatusCodeKey.Int(502))
-			_, _ = fmt.Fprintf(w, "%s", utils.JsonError(err))
-			return
-		}
-
 		defer func() {
 			if nil != any(recover()) {
 				w.WriteHeader(500)
@@ -38,16 +30,17 @@ func PostTorrentById(route string) http.HandlerFunc {
 			}
 		}()
 
+		body, _ := ioutil.ReadAll(c.Body)
 		var queue cassandra.Queue
-		err = json.Unmarshal(body, &queue)
+		err := json.Unmarshal(body, &queue)
 		if err != nil || queue.InfoHash == "" {
 			w.WriteHeader(400)
 			labeler.Add(semconv.HTTPStatusCodeKey.Int(400))
 			_, _ = fmt.Fprintf(w, "%s", utils.JsonError(errors.New("bad request json")))
 			return
 		}
-		queue.InfoHash = strings.ToLower(queue.InfoHash)
 
+		queue.InfoHash = strings.ToLower(queue.InfoHash)
 		w.WriteHeader(200)
 		go addTorrent(queue.InfoHash)
 		_, _ = fmt.Fprintf(w, utils.JsonMessage("successfully received submission for "+queue.InfoHash))
