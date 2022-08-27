@@ -58,28 +58,26 @@ func getResult(torrent cassandra.Torrent) {
 	seeders := uint32(0)
 	leechers := uint32(0)
 	for _, tracker := range trackers {
-		client, _ := udptracker.NewClientByDial("udp4", tracker)
-		hs := []metainfo.Hash{metainfo.NewHashFromString(torrent.InfoHash)}
-		ctx, _ := context.WithTimeout(context.Background(), time.Second*3)
-		rs, _ := client.Scrape(ctx, hs)
-		for _, r := range rs {
-			if peers < r.Seeders+r.Leechers {
-				peers = r.Seeders + r.Leechers
-				seeders = r.Seeders
-				leechers = r.Leechers
-			}
-			//fmt.Println("Tracker: " + tracker)
-			//fmt.Printf("Seeders: %d\n", r.Seeders)
-			//fmt.Printf("Leechers: %d\n", r.Leechers)
-			//fmt.Printf("Completed: %d\n", r.Completed)
+		r, err := getScrapeResponse(tracker, torrent.InfoHash)
+		if err == nil && peers < r.Seeders+r.Leechers {
+			peers = r.Seeders + r.Leechers
+			seeders = r.Seeders
+			leechers = r.Leechers
 		}
 	}
-	//fmt.Printf("Peers: %d\n", peers)
-	//fmt.Printf("Seeders: %d\n", seeders)
-	//fmt.Printf("Leechers: %d\n", leechers)
 	torrent.Peers = int(peers)
 	torrent.Seeders = int(seeders)
 	torrent.Leechers = int(leechers)
 	_ = cassandra.UpdateTorrentByInfohashPeers(torrent)
 	elasticsearch.Update(torrent)
+}
+
+func getScrapeResponse(infohash, tracker string) (udptracker.ScrapeResponse, error) {
+	client, _ := udptracker.NewClientByDial("udp4", tracker)
+	hs := []metainfo.Hash{metainfo.NewHashFromString(infohash)}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
+	defer cancel()
+	rs, err := client.Scrape(ctx, hs)
+	_ = client.Close()
+	return rs[0], err
 }
