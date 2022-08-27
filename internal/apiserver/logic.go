@@ -18,8 +18,10 @@ func addTorrent(infohash string) {
 		// already indexed
 		// send to refresher
 		go func() {
-			resp, _ := http.Get(RefresherURL + "/torrent/" + infohash)
-			_ = resp.Body.Close()
+			resp, err := http.Get(RefresherURL + "/torrent/" + infohash)
+			if err == nil {
+				_ = resp.Body.Close()
+			}
 		}()
 	} else {
 		// check if it's already in queue

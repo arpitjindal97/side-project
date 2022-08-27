@@ -77,7 +77,13 @@ func getScrapeResponse(infohash, tracker string) (udptracker.ScrapeResponse, err
 	hs := []metainfo.Hash{metainfo.NewHashFromString(infohash)}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
 	defer cancel()
+	defer func() {
+		if nil != any(recover()) {
+		}
+	}()
 	rs, err := client.Scrape(ctx, hs)
-	_ = client.Close()
+	if err == nil {
+		_ = client.Close()
+	}
 	return rs[0], err
 }
