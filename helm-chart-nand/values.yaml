@@ -35,20 +35,30 @@ cassandra:
       namespace: ""
 
 provisionDataStore:
-  elasticsearch: false
+  elasticsearch: true
   cassandra: true
 
 elasticsearch:
   image:
     tag: 7.17.5
+  extraConfig:
+    node.attr.dc: nand1
+    cluster.routing.allocation.awareness.attributes: dc
+  extraHosts:
+    - vergon-elasticsearch-master-hl.default
+    - vergon-elasticsearch-data-hl.default
   master:
     masterOnly: false
     replicaCount: 1
     autoscaling:
       minReplicas: 1
       maxReplicas: 2
-    affinity:
-      *affinityNotMaster
+    nodeSelector:
+      topology.kubernetes.io/region: nand
+    resources:
+      requests:
+        cpu: 150m
+        memory: 2048Mi
   data:
     replicaCount: 0
   ingest:

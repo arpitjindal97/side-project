@@ -14,7 +14,7 @@ vergon:
             operator: NotIn
             values:
             - arpit-server
-  topologySpeadConstraints: &topologyRegion
+  topologySpreadConstraints: &topologyRegion
     - topologyKey: "topology.kubernetes.io/region"
       whenUnsatisfiable: "DoNotSchedule"
       maxSkew: 1
